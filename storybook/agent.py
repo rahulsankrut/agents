@@ -350,7 +350,7 @@ def export_story(story_id: int, format: str = "json") -> Dict[str, Any]:
 # Create the main storybook agent
 root_agent = Agent(
     name="storybook_agent",
-    model="gemini-2.0-flash-exp",
+    model="gemini-2.5-pro",
     description=(
         "A creative AI agent that helps users create, edit, manage, and analyze stories. "
         "I can generate story ideas, create complete stories, edit existing ones, "
