@@ -62,6 +62,9 @@ class ImageAnalyzer:
             analysis['project_name'] = project_details['project_name']
             analysis['analysis_timestamp'] = project_details['created_at']
             
+            # Add the original image data for PowerPoint embedding
+            analysis['image_data'] = base64.b64encode(image_bytes).decode('utf-8')
+            
             logger.info(f"Successfully analyzed image: {filename}")
             return analysis
             

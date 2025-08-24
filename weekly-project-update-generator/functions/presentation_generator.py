@@ -219,17 +219,43 @@ class PresentationGenerator:
         title_para.font.size = Pt(28)
         title_para.font.color.rgb = RGBColor(44, 62, 80)
         
-        # Add image placeholder (since we can't embed actual images in this demo)
-        # In production, you would insert the actual image here
-        image_placeholder = slide.shapes.add_shape(
-            MSO_SHAPE.RECTANGLE,
-            self.margin, Inches(1.5),
-            Inches(6), Inches(4)
-        )
-        image_placeholder.fill.solid()
-        image_placeholder.fill.fore_color.rgb = RGBColor(236, 240, 241)  # Light gray
-        image_placeholder.line.color.rgb = RGBColor(189, 195, 199)
-        image_placeholder.line.width = Pt(2)
+        # Add the actual image if available
+        try:
+            if 'image_data' in analysis and analysis['image_data']:
+                # Decode base64 image data
+                import base64
+                image_bytes = base64.b64decode(analysis['image_data'])
+                
+                # Add image to slide
+                image_stream = BytesIO(image_bytes)
+                slide.shapes.add_picture(
+                    image_stream,
+                    self.margin, Inches(1.5),
+                    Inches(6), Inches(4)
+                )
+            else:
+                # Fallback to placeholder if no image data
+                image_placeholder = slide.shapes.add_shape(
+                    MSO_SHAPE.RECTANGLE,
+                    self.margin, Inches(1.5),
+                    Inches(6), Inches(4)
+                )
+                image_placeholder.fill.solid()
+                image_placeholder.fill.fore_color.rgb = RGBColor(236, 240, 241)  # Light gray
+                image_placeholder.line.color.rgb = RGBColor(189, 195, 199)
+                image_placeholder.line.width = Pt(2)
+        except Exception as e:
+            logger.warning(f"Could not add image to slide: {str(e)}. Using placeholder instead.")
+            # Fallback to placeholder
+            image_placeholder = slide.shapes.add_shape(
+                MSO_SHAPE.RECTANGLE,
+                self.margin, Inches(1.5),
+                Inches(6), Inches(4)
+            )
+            image_placeholder.fill.solid()
+            image_placeholder.fill.fore_color.rgb = RGBColor(236, 240, 241)  # Light gray
+            image_placeholder.line.color.rgb = RGBColor(189, 195, 199)
+            image_placeholder.line.width = Pt(2)
         
         # Add image label
         image_label = slide.shapes.add_textbox(
