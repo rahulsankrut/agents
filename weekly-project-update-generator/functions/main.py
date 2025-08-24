@@ -138,12 +138,19 @@ def generate_presentation(request):
         blob = bucket.blob(presentation_filename)
         blob.upload_from_string(presentation_data, content_type='application/vnd.openxmlformats-officedocument.presentationml.presentation')
         
-        # Generate signed URL for download (expires in 1 hour)
-        download_url = blob.generate_signed_url(
-            version="v4",
-            expiration=3600,  # 1 hour
-            method="GET"
-        )
+        # Generate public URL for download (avoiding signed URL credential issues)
+        try:
+            # Try to generate signed URL first
+            download_url = blob.generate_signed_url(
+                version="v4",
+                expiration=3600,  # 1 hour
+                method="GET"
+            )
+        except Exception as e:
+            logger.warning(f"Could not generate signed URL: {str(e)}. Using public URL instead.")
+            # Fallback to public URL
+            blob.make_public()
+            download_url = blob.public_url
         
         # Save project metadata
         project_id = project_manager.save_project_metadata(project_details, image_analyses, presentation_filename)
