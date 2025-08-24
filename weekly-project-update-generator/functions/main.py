@@ -164,3 +164,28 @@ def generate_presentation(request):
             'error': 'Internal server error',
             'message': str(e)
         }), 500, headers)
+
+# For 2nd gen functions compatibility
+if __name__ == "__main__":
+    import flask
+    from flask import Flask, request
+    
+    app = Flask(__name__)
+    
+    @app.route('/', methods=['POST', 'OPTIONS'])
+    def handle_request():
+        # Create a mock request object for the function
+        class MockRequest:
+            def __init__(self, flask_request):
+                self.method = flask_request.method
+                self._json = flask_request.get_json() if flask_request.is_json else None
+            
+            def get_json(self):
+                return self._json
+        
+        mock_request = MockRequest(request)
+        return generate_presentation(mock_request)
+    
+    # Get port from environment variable (required for 2nd gen functions)
+    port = int(os.getenv('PORT', 8080))
+    app.run(host='0.0.0.0', port=port, debug=False)

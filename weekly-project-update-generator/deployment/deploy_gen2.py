@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Deployment script for Weekly Project Update PowerPoint Generator
+Deployment script for Weekly Project Update PowerPoint Generator (2nd Gen Functions)
 
-This script deploys the Cloud Functions and sets up the necessary infrastructure.
+This script deploys the Cloud Functions as 2nd gen functions and sets up the necessary infrastructure.
 """
 
 import os
@@ -79,7 +79,8 @@ def enable_apis():
         "cloudbuild.googleapis.com",
         "storage.googleapis.com",
         "aiplatform.googleapis.com",
-        "logging.googleapis.com"
+        "logging.googleapis.com",
+        "run.googleapis.com"  # Required for 2nd gen functions
     ]
     
     for api in apis:
@@ -108,22 +109,25 @@ def create_storage_buckets():
             print(f"ℹ️ Bucket {bucket_name} already exists or creation failed")
 
 def deploy_functions():
-    """Deploy the Cloud Functions"""
-    print("\n🚀 Deploying Cloud Functions...")
+    """Deploy the Cloud Functions as 2nd gen"""
+    print("\n🚀 Deploying Cloud Functions (2nd Gen)...")
     
     functions_dir = Path(__file__).parent.parent / "functions"
     
-    # Deploy main function
-    print("Deploying main function...")
+    # Deploy main function as 2nd gen
+    print("Deploying main function as 2nd gen...")
     run_command(
         f"gcloud functions deploy generate_presentation "
+        f"--gen2 "
         f"--runtime python311 "
         f"--trigger-http "
         f"--allow-unauthenticated "
         f"--source {functions_dir} "
         f"--entry-point generate_presentation "
         f"--set-env-vars GOOGLE_CLOUD_PROJECT=$(gcloud config get-value project) "
-        f"--no-gen2",
+        f"--region us-central1 "
+        f"--memory 2Gi "
+        f"--timeout 540s",
         cwd=functions_dir
     )
     
@@ -147,7 +151,8 @@ def setup_authentication():
     roles = [
         "roles/storage.admin",
         "roles/aiplatform.user",
-        "roles/logging.logWriter"
+        "roles/logging.logWriter",
+        "roles/run.invoker"  # Required for 2nd gen functions
     ]
     
     for role in roles:
@@ -156,8 +161,8 @@ def setup_authentication():
 
 def main():
     """Main deployment function"""
-    print("🚀 Weekly Project Update PowerPoint Generator - Deployment")
-    print("=" * 60)
+    print("🚀 Weekly Project Update PowerPoint Generator - Deployment (2nd Gen)")
+    print("=" * 70)
     
     # Check prerequisites
     check_prerequisites()
@@ -186,7 +191,7 @@ def main():
     
     # Get function URL
     try:
-        function_url = run_command("gcloud functions describe generate_presentation --format='value(httpsTrigger.url)'")
+        function_url = run_command("gcloud functions describe generate_presentation --gen2 --region us-central1 --format='value(serviceConfig.uri)'")
         print(f"\n🌐 Your Cloud Function URL: {function_url.strip()}")
     except:
         print("\n⚠️ Could not retrieve function URL. Check the Google Cloud Console.")
