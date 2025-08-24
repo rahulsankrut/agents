@@ -3,9 +3,25 @@ import { CheckCircle, Download, FileText, Plus, Share2 } from 'lucide-react';
 
 const DownloadPage = ({ projectData, onNewProject }) => {
   const handleDownload = () => {
-    // In production, this would trigger the actual download
-    // For demo purposes, show an alert
-    alert('In production, this would download your PowerPoint presentation!');
+    // Check if we have a download URL from the Cloud Function
+    if (projectData.result && projectData.result.download_url) {
+      // If it's a real URL, download the file
+      if (projectData.result.download_url.startsWith('http')) {
+        // Create a temporary link and trigger download
+        const link = document.createElement('a');
+        link.href = projectData.result.download_url;
+        link.download = projectData.result.presentation_filename || 'presentation.pptx';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } else {
+        // If it's a bucket path message, show it
+        alert(projectData.result.download_url);
+      }
+    } else {
+      // Fallback if no download URL
+      alert('Download URL not available. Please try again.');
+    }
   };
 
   const handleShare = () => {
