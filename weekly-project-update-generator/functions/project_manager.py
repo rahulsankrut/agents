@@ -27,7 +27,7 @@ class ProjectManager:
             storage_client: Google Cloud Storage client
         """
         self.storage_client = storage_client
-        self.metadata_bucket_name = 'weekly-project-metadata'
+        self.metadata_bucket_name = 'weekly-metadata-465923'
         self._ensure_bucket_exists()
     
     def _ensure_bucket_exists(self):

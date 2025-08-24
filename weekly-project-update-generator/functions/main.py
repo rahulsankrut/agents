@@ -131,7 +131,7 @@ def generate_presentation(request):
         )
         
         # Save presentation to Cloud Storage
-        bucket_name = os.getenv('PRESENTATIONS_BUCKET', 'weekly-project-presentations')
+        bucket_name = os.getenv('PRESENTATIONS_BUCKET', 'weekly-presentations-465923')
         presentation_filename = f"{project_details['project_name'].replace(' ', '_')}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pptx"
         
         bucket = storage_client.bucket(bucket_name)
