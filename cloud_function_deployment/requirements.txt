@@ -1,0 +1,14 @@
+# Step 2: Add PowerPoint generation
+functions-framework==3.*
+Flask==2.3.*
+Werkzeug==2.3.*
+
+# PowerPoint generation dependencies
+python-pptx==0.6.21
+Pillow>=10.4.0
+
+# Additional utilities
+requests>=2.31.0
+
+# Cloud Storage support
+google-cloud-storage>=2.10.0

@@ -1,0 +1,7 @@
+# Google Cloud Configuration
+GOOGLE_CLOUD_PROJECT=agent-space-465923
+GOOGLE_CLOUD_LOCATION=us-central1
+GOOGLE_GENAI_USE_VERTEXAI=1
+
+# Cloud Function URL
+CLOUD_FUNCTION_URL=https://us-central1-agent-space-465923.cloudfunctions.net/ppt-generator
