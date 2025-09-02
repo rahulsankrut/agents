@@ -14,8 +14,8 @@ cloudpickle = "^3.1.1"
 pylint = "^3.3.6"
 google-cloud-aiplatform = { extras = [
     "adk",
-    "agent_engine",
-], version = "^1.93.0" }
+    "agent_engines",
+], version = "^1.91.0" }
 google-adk = "^1.0.0"
 jsonschema = "^4.23.0"
 requests = "^2.31.0"
@@ -30,7 +30,14 @@ flake8-pyproject = "^1.2.3"
 pylint = "^3.3.6"
 pyink = "^24.10.1"
 jsonschema = "^4.23.0"
-google-cloud-aiplatform = { extras = ["evaluation"], version = "^1.93.0" }
+google-cloud-aiplatform = { extras = ["evaluation"], version = "^1.91.0" }
+
+[tool.poetry.group.deployment]
+optional = true
+
+[tool.poetry.group.deployment.dependencies]
+absl-py = "^2.2.1"
+python-dotenv = "^1.0.1"
 
 [tool.pytest.ini_options]
 console_output_style = "progress"

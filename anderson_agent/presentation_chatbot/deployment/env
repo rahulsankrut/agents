@@ -1,0 +1,19 @@
+# Agent Engine Deployment Environment Variables
+# Copy this file to .env and fill in your values
+
+# Required: Your Google Cloud Project ID
+GOOGLE_CLOUD_PROJECT=agent-space-465923
+
+# Required: Your preferred Google Cloud region
+# Recommended: us-central1, us-east1, europe-west1, asia-northeast1
+GOOGLE_CLOUD_LOCATION=us-central1
+
+# Required: Google Cloud Storage bucket for staging deployment artifacts
+# Create a bucket if you don't have one: gsutil mb gs://your-bucket-name
+GOOGLE_CLOUD_STORAGE_BUCKET=anderson-agent-presentation-chatbot
+
+# Optional: Agent Engine resource ID (will be set after deployment)
+AGENT_ENGINE_ID=
+
+# Optional: Default user ID for testing
+DEFAULT_USER_ID=admin@rahulsankrut.altostrat.com

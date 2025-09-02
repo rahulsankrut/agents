@@ -5,9 +5,10 @@ import warnings
 from google.adk import Agent
 from .config import config
 from .prompts import GLOBAL_INSTRUCTION, INSTRUCTION
-from .tools.tools import (
+from .tools.tools_enhanced import (
     generate_presentation,
     get_presentation_templates,
+    list_presentations,
 )
 
 warnings.filterwarnings("ignore", category=UserWarning, module=".*pydantic.*")
@@ -27,5 +28,6 @@ root_agent = Agent(
     tools=[
         generate_presentation,
         get_presentation_templates,
+        list_presentations,
     ],
 )

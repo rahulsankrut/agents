@@ -137,6 +137,40 @@ poetry run pyink .
 poetry run pylint presentation_chatbot/
 ```
 
+## Deployment
+
+### Agent Engine Deployment
+
+The presentation chatbot can be deployed to Google Cloud Vertex AI Agent Engine for production use.
+
+#### Quick Deploy
+
+1. **Set up environment**:
+   ```bash
+   cd deployment
+   cp env.template .env
+   # Edit .env with your GCP project details
+   ```
+
+2. **Install deployment dependencies**:
+   ```bash
+   poetry install --with deployment
+   ```
+
+3. **Deploy to Agent Engine**:
+   ```bash
+   python deployment/deploy.py --create
+   ```
+
+4. **Test the deployed agent**:
+   ```bash
+   python deployment/test_deployment.py \
+     --resource_id=YOUR_RESOURCE_ID \
+     --user_id=test_user
+   ```
+
+For detailed deployment instructions, see [deployment/README.md](deployment/README.md).
+
 ## License
 
 Apache License 2.0
