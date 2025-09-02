@@ -60,11 +60,20 @@ class ProjectManager:
             # Generate unique project ID
             project_id = str(uuid.uuid4())
             
+            # Create serializable version of image analyses (remove raw bytes for storage)
+            serializable_analyses = []
+            for analysis in image_analyses:
+                serializable_analysis = analysis.copy()
+                # Remove raw image bytes as they can't be serialized to JSON
+                if 'image_bytes' in serializable_analysis:
+                    del serializable_analysis['image_bytes']
+                serializable_analyses.append(serializable_analysis)
+            
             # Create metadata structure
             metadata = {
                 'project_id': project_id,
                 'project_details': project_details,
-                'image_analyses': image_analyses,
+                'image_analyses': serializable_analyses,
                 'presentation_filename': presentation_filename,
                 'created_at': datetime.now().isoformat(),
                 'total_images': len(image_analyses),
@@ -93,7 +102,7 @@ class ProjectManager:
             )
             
             # Save individual image analyses for easier access
-            for i, analysis in enumerate(image_analyses):
+            for i, analysis in enumerate(serializable_analyses):
                 image_blob = bucket.blob(f"projects/{project_id}/images/{analysis['filename']}_analysis.json")
                 image_blob.upload_from_string(
                     json.dumps(analysis, indent=2, default=str),
