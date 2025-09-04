@@ -23,10 +23,10 @@ logger = logging.getLogger(__name__)
 
 
 root_agent = Agent(
-    model=configs.agent_settings.model,
+    model=configs.agent_model,
     global_instruction=GLOBAL_INSTRUCTION,
     instruction=INSTRUCTION,
-    name=configs.agent_settings.name,
+    name=configs.agent_name,
     tools=[
         get_summary,
         get_exceptions,

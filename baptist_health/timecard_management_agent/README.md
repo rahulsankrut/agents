@@ -4,7 +4,7 @@ A sophisticated AI agent built with Google's Agent Development Kit (ADK) to stre
 
 ## Overview
 
-**Spark** is an intelligent timecard management assistant that helps healthcare managers efficiently review, approve, and manage employee timecards. Built specifically for Baptist Health, it transforms hours of manual review into minutes of intelligent interaction.
+**Spark_v2** is an intelligent timecard management assistant that helps healthcare managers efficiently review, approve, and manage employee timecards. Built specifically for Baptist Health, it transforms hours of manual review into minutes of intelligent interaction.
 
 ## Features
 
@@ -113,8 +113,20 @@ timecard_management_agent/
 
 Deploy to Google Cloud Agent Engine:
 ```bash
-cd deployment
-python deploy.py
+# Deploy the agent
+poetry run python deploy.py --create
+
+# List deployed agents
+poetry run python deploy.py --list
+
+# Delete an agent
+poetry run python deploy.py --delete --resource_id=YOUR_AGENT_ID
+```
+
+### Test Deployed Agent
+```bash
+# Test the deployed agent
+poetry run python test_deployed.py
 ```
 
 ## Contributing

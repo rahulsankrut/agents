@@ -1,0 +1,12 @@
+# Google Cloud Configuration
+GOOGLE_CLOUD_PROJECT=agent-space-465923
+GOOGLE_CLOUD_LOCATION=us-central1
+GOOGLE_GENAI_USE_VERTEXAI=1
+
+# Agent Configuration
+AGENT_MODEL=gemini-2.5-pro
+AGENT_NAME=Spark_v2
+
+# Firestore Configuration
+PROJECT_ID=agent-space-465923
+DATABASE_ID=timecard-demo-database
