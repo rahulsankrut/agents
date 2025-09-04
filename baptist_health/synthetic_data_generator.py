@@ -1,5 +1,5 @@
 import random
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 from google.cloud import firestore
 import uuid
 
@@ -96,7 +96,9 @@ def seed_timecards(db, manager_id):
                     'exception_reason': 'Not Submitted',
                     'total_hours': 0,
                     'overtime_hours': 0,
-                    'notes': ''
+                    'notes': '',
+                    'approved_at': None,
+                    'approved_by': None
                 }
             else:
                 # Create a standard, submitted timecard (with a chance of other exceptions)
@@ -110,16 +112,37 @@ def seed_timecards(db, manager_id):
                         "Shift duration does not match scheduled hours."
                     ])
                 
+                # Determine status and approval data based on pay period
+                if pay_period in ["2025-08-08", "2025-08-15", "2025-08-22"]:
+                    # Past pay periods - most should be approved
+                    if not has_exception:
+                        # Standard timecards from past periods should be approved
+                        status = 'approved'
+                        approved_at = f"{pay_period} 16:00:00"  # End of pay period
+                        approved_by = 'Jenica'
+                    else:
+                        # Exceptions from past periods - 70% resolved, 30% still pending
+                        status = 'approved' if random.random() > 0.3 else 'submitted'
+                        approved_at = f"{pay_period} 16:00:00" if status == 'approved' else None
+                        approved_by = 'Jenica' if status == 'approved' else None
+                else:
+                    # Current week (2025-08-29) - keep pending for demo
+                    status = 'submitted'
+                    approved_at = None
+                    approved_by = None
+                
                 timecard_data = {
                     'employee_id': emp_doc.id,
                     'manager_id': manager_id,
                     'pay_period_end': pay_period,
-                    'status': 'submitted',
+                    'status': status,
                     'has_exception': has_exception,
                     'exception_reason': exception_reason,
                     'total_hours': round(random.uniform(38.0, 45.0), 2),
                     'overtime_hours': round(random.uniform(0.0, 5.0), 2) if has_exception else 0,
-                    'notes': "Manager approval required." if has_exception else "Standard hours."
+                    'notes': "Manager approval required." if has_exception else "Standard hours.",
+                    'approved_at': approved_at,  # Will be set when approved by agent
+                    'approved_by': approved_by   # Will be set when approved by agent
                 }
             
             # Add the generated timecard to the batch

@@ -44,7 +44,7 @@
         }
         .employee-name-cell {
             font-weight: bold;
-            justify-content: left;
+            justify-content: flex-start;
             position: sticky;
             left: 0;
             z-index: 5;
@@ -104,11 +104,38 @@
                     <label for="payPeriodFilter" class="block text-sm font-medium text-gray-700 mb-1">Filter by Pay Period</label>
                     <select id="payPeriodFilter" class="p-2 border rounded-md w-full"></select>
                 </div>
+                <div>
+                    <label for="statusFilter" class="block text-sm font-medium text-gray-700 mb-1">Filter by Status</label>
+                    <select id="statusFilter" class="p-2 border rounded-md w-full">
+                        <option value="all">All Statuses</option>
+                        <option value="not submitted">Not Submitted</option>
+                        <option value="submitted">Submitted</option>
+                        <option value="approved">Approved</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="exceptionFilter" class="block text-sm font-medium text-gray-700 mb-1">Filter by Exception</label>
+                    <select id="exceptionFilter" class="p-2 border rounded-md w-full">
+                        <option value="all">All</option>
+                        <option value="true">Has Exception</option>
+                        <option value="false">No Exception</option>
+                    </select>
+                </div>
             </div>
 
 
             <div>
                 <h2 class="text-2xl font-semibold mb-4 border-b pb-2">Timecards</h2>
+                <div class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                    <p class="text-sm text-blue-800">
+                        <strong>Demo Note:</strong> Historical pay periods (Aug 8, 15, 22) show approved timecards. 
+                        Current week (Aug 29) is pending for agent interaction.
+                    </p>
+                </div>
+                <div id="timecard-summary" class="mb-4 p-4 bg-gray-50 rounded-lg">
+                    <h3 class="text-lg font-semibold mb-2">Summary</h3>
+                    <div id="summary-stats" class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm"></div>
+                </div>
                 <div id="timecards-table" class="table-container bg-white rounded-lg shadow-sm"></div>
             </div>
 
@@ -126,7 +153,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, query, where, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const connectButton = document.getElementById('connectButton');
         const projectIdInput = document.getElementById('projectIdInput');
@@ -277,11 +304,21 @@
                 filter.innerHTML += `<option value="${p}">${p}</option>`;
             });
             filter.addEventListener('change', displayTimecards);
+            
+            // Setup status filter
+            const statusFilter = document.getElementById('statusFilter');
+            statusFilter.addEventListener('change', displayTimecards);
+            
+            // Setup exception filter
+            const exceptionFilter = document.getElementById('exceptionFilter');
+            exceptionFilter.addEventListener('change', displayTimecards);
         }
 
         function displayTimecards() {
             const payPeriodFilterValue = document.getElementById('payPeriodFilter').value;
             const employeeFilterValue = document.getElementById('employeeFilter').value;
+            const statusFilterValue = document.getElementById('statusFilter').value;
+            const exceptionFilterValue = document.getElementById('exceptionFilter').value;
 
             let filteredData = allTimecards;
 
@@ -291,7 +328,15 @@
             if (employeeFilterValue !== 'all') {
                 filteredData = filteredData.filter(tc => tc.employee_id === employeeFilterValue);
             }
+            if (statusFilterValue !== 'all') {
+                filteredData = filteredData.filter(tc => tc.status === statusFilterValue);
+            }
+            if (exceptionFilterValue !== 'all') {
+                filteredData = filteredData.filter(tc => tc.has_exception.toString() === exceptionFilterValue);
+            }
 
+            // Display summary statistics
+            displaySummaryStats(filteredData);
 
             const container = document.getElementById('timecards-table');
             let table = `<table class="min-w-full divide-y divide-gray-200"><thead class="bg-gray-50"><tr>
@@ -300,6 +345,8 @@
                 <th class="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                 <th class="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Exception</th>
                 <th class="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reason</th>
+                <th class="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Approved By</th>
+                <th class="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Approved At</th>
                 </tr></thead><tbody class="bg-white divide-y divide-gray-200">`;
             
             filteredData.sort((a,b) => (employeeMap.get(a.employee_id) || '').localeCompare(employeeMap.get(b.employee_id) || ''))
@@ -314,12 +361,17 @@
                     ? `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Yes</span>`
                     : `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">No</span>`;
                 
+                const approvedBy = tc.approved_by || 'N/A';
+                const approvedAt = tc.approved_at || 'N/A';
+                
                 table += `<tr>
                     <td class="py-4 px-6">${employeeMap.get(tc.employee_id) || tc.employee_id}</td>
                     <td class="py-4 px-6">${tc.pay_period_end}</td>
                     <td class="py-4 px-6">${statusBadge}</td>
                     <td class="py-4 px-6">${exceptionBadge}</td>
                     <td class="py-4 px-6">${tc.exception_reason || 'N/A'}</td>
+                    <td class="py-4 px-6">${approvedBy}</td>
+                    <td class="py-4 px-6">${approvedAt}</td>
                 </tr>`;
             });
             table += `</tbody></table>`;
@@ -391,6 +443,43 @@
                 gridContainer.style.gridTemplateColumns = `150px repeat(${daysInMonth}, minmax(100px, 1fr))`;
             }
         }
+
+        function displaySummaryStats(data) {
+            const total = data.length;
+            const approved = data.filter(tc => tc.status === 'approved').length;
+            const submitted = data.filter(tc => tc.status === 'submitted').length;
+            const notSubmitted = data.filter(tc => tc.status === 'not submitted').length;
+            const withExceptions = data.filter(tc => tc.has_exception).length;
+            const withoutExceptions = data.filter(tc => !tc.has_exception).length;
+
+            const summaryContainer = document.getElementById('summary-stats');
+            summaryContainer.innerHTML = `
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-gray-900">${total}</div>
+                    <div class="text-gray-600">Total Timecards</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-green-600">${approved}</div>
+                    <div class="text-gray-600">Approved</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-blue-600">${submitted}</div>
+                    <div class="text-gray-600">Submitted</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-yellow-600">${notSubmitted}</div>
+                    <div class="text-gray-600">Not Submitted</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-red-600">${withExceptions}</div>
+                    <div class="text-gray-600">With Exceptions</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-green-600">${withoutExceptions}</div>
+                    <div class="text-gray-600">No Exceptions</div>
+                </div>
+            `;
+                }
 
     </script>
 </body>
