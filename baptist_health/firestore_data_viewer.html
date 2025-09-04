@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timecard Demo - Firestore Data Viewer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .table-container {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+        }
+        th, td {
+            white-space: nowrap;
+            padding: 8px 12px;
+            text-align: left;
+        }
+        /* Styles for the new Schedule Planner */
+        .schedule-grid {
+            display: grid;
+            /* The grid-template-columns property is now set dynamically via JavaScript */
+            gap: 1px;
+            background-color: #e5e7eb; /* gray-200 */
+        }
+        .schedule-header, .schedule-cell, .employee-name-cell {
+            background-color: white;
+            padding: 6px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .schedule-header {
+            font-weight: bold;
+            background-color: #f9fafb; /* gray-50 */
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .employee-name-cell {
+            font-weight: bold;
+            justify-content: left;
+            position: sticky;
+            left: 0;
+            z-index: 5;
+        }
+        .shift-cell {
+            background-color: #e0e7ff; /* indigo-100 */
+            border-left: 3px solid #6366f1; /* indigo-500 */
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <div class="container mx-auto p-4 sm:p-6 lg:p-8">
+        <header class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Firestore Data Viewer</h1>
+            <p class="text-gray-600 mt-1">Live data from your 'timecard-demo-database'.</p>
+        </header>
+
+        <div id="config-section" class="mb-8 p-4 bg-yellow-100 border-l-4 border-yellow-500 rounded-md">
+            <h2 class="text-xl font-semibold mb-2 text-yellow-800">Action Required: Enter Your Project ID</h2>
+            <p class="text-yellow-700 mb-4">Please paste your Google Cloud Project ID into the box below to connect to Firestore.</p>
+            <input type="text" id="projectIdInput" placeholder="your-gcp-project-id" class="w-full p-2 border border-yellow-400 rounded-md focus:ring-2 focus:ring-yellow-500 focus:outline-none">
+            <button id="connectButton" class="mt-4 px-4 py-2 bg-yellow-500 text-white font-semibold rounded-md hover:bg-yellow-600 transition-colors">Connect and Load Data</button>
+        </div>
+
+        <div id="loader" class="hidden text-center py-10">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+            <p class="mt-4 text-gray-600">Loading data from Firestore...</p>
+        </div>
+        
+        <div id="error-message" class="hidden p-4 bg-red-100 text-red-700 border border-red-300 rounded-md"></div>
+
+        <div id="data-display" class="hidden space-y-8">
+            <div>
+                <h2 class="text-2xl font-semibold mb-4 border-b pb-2">Manager</h2>
+                <div id="manager-info" class="p-4 bg-white rounded-lg shadow-sm"></div>
+            </div>
+
+             <div class="bg-white rounded-lg shadow-sm border">
+                <button id="toggle-employees-btn" class="w-full flex justify-between items-center p-4 text-left focus:outline-none">
+                    <h2 class="text-xl font-semibold">All Employees</h2>
+                    <svg id="employee-chevron" class="w-6 h-6 transform transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+                <div id="employees-table-container" class="hidden border-t">
+                     <div id="employees-table" class="table-container p-4"></div>
+                </div>
+            </div>
+
+            <div class="p-4 bg-white rounded-lg shadow-sm border grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label for="employeeFilter" class="block text-sm font-medium text-gray-700 mb-1">Filter by Employee</label>
+                    <select id="employeeFilter" class="p-2 border rounded-md w-full"></select>
+                </div>
+                <div>
+                    <label for="payPeriodFilter" class="block text-sm font-medium text-gray-700 mb-1">Filter by Pay Period</label>
+                    <select id="payPeriodFilter" class="p-2 border rounded-md w-full"></select>
+                </div>
+            </div>
+
+
+            <div>
+                <h2 class="text-2xl font-semibold mb-4 border-b pb-2">Timecards</h2>
+                <div id="timecards-table" class="table-container bg-white rounded-lg shadow-sm"></div>
+            </div>
+
+            <div>
+                <h2 class="text-2xl font-semibold mb-4 border-b pb-2">Schedule Planner</h2>
+                <div class="flex items-center mb-4">
+                    <label for="scheduleMonthFilter" class="mr-2">View Month:</label>
+                    <select id="scheduleMonthFilter" class="p-2 border rounded-md"></select>
+                </div>
+                <div id="schedules-table" class="table-container bg-white rounded-lg shadow-sm">
+                    </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const connectButton = document.getElementById('connectButton');
+        const projectIdInput = document.getElementById('projectIdInput');
+        
+        let db;
+        let allTimecards = [];
+        let allSchedules = [];
+        let employeeMap = new Map();
+
+        connectButton.addEventListener('click', () => {
+            const projectId = projectIdInput.value;
+            if (!projectId) {
+                alert('Please enter your Google Cloud Project ID.');
+                return;
+            }
+            
+            const firebaseConfig = { projectId: projectId };
+
+            try {
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app, 'timecard-demo-database');
+                fetchAndDisplayData();
+            } catch (error) {
+                 showError("Failed to initialize Firebase. Check your Project ID and ensure the API is enabled.", error);
+            }
+        });
+
+        function showError(message, error) {
+            console.error(message, error);
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.textContent = `${message} See console (F12) for details.`;
+            errorDiv.classList.remove('hidden');
+            document.getElementById('loader').classList.add('hidden');
+            document.getElementById('data-display').classList.add('hidden');
+        }
+
+        async function fetchAndDisplayData() {
+            document.getElementById('config-section').classList.add('hidden');
+            document.getElementById('loader').classList.remove('hidden');
+            document.getElementById('error-message').classList.add('hidden');
+
+            try {
+                const [managerSnap, employeeSnap, timecardSnap, scheduleSnap] = await Promise.all([
+                    getDocs(collection(db, "managers")),
+                    getDocs(collection(db, "employees")),
+                    getDocs(collection(db, "timecards")),
+                    getDocs(collection(db, "schedules")),
+                ]);
+
+                employeeSnap.docs.forEach(doc => {
+                    const emp = doc.data();
+                    employeeMap.set(emp.employee_id, emp.name);
+                });
+                displayEmployees(employeeSnap.docs.map(d => d.data()));
+
+                const manager = managerSnap.docs[0]?.data();
+                displayManagerInfo(manager);
+
+                // Setup all filters
+                setupEmployeeFilter();
+                
+                allTimecards = timecardSnap.docs.map(d => d.data());
+                setupTimecardFilter();
+                
+                allSchedules = scheduleSnap.docs.map(d => d.data());
+                setupScheduleFilter();
+
+                // Smartly select the current month (Sept 2025 for demo purposes)
+                const scheduleFilter = document.getElementById('scheduleMonthFilter');
+                const demoMonthValue = "2025-09";
+                const optionToSelect = Array.from(scheduleFilter.options).find(opt => opt.value === demoMonthValue);
+
+                if (optionToSelect) {
+                    scheduleFilter.value = demoMonthValue;
+                } else {
+                    scheduleFilter.selectedIndex = 1; // Fallback to first available month
+                }
+                
+                // Initial display
+                displayTimecards(); 
+                displaySchedules();
+                setupCollapsibleEmployeeList();
+
+
+                document.getElementById('loader').classList.add('hidden');
+                document.getElementById('data-display').classList.remove('hidden');
+
+            } catch (error) {
+                showError("Failed to fetch data from Firestore. Please check your project's Firestore security rules and ensure the database exists.", error);
+            }
+        }
+        
+        function setupCollapsibleEmployeeList() {
+            const toggleBtn = document.getElementById('toggle-employees-btn');
+            const employeeContainer = document.getElementById('employees-table-container');
+            const employeeChevron = document.getElementById('employee-chevron');
+
+            toggleBtn.addEventListener('click', () => {
+                employeeContainer.classList.toggle('hidden');
+                employeeChevron.classList.toggle('rotate-180');
+            });
+        }
+
+        function setupEmployeeFilter() {
+            const filter = document.getElementById('employeeFilter');
+            filter.innerHTML = `<option value="all">All Employees</option>`;
+            
+            const sortedEmployees = [...employeeMap.entries()].sort((a, b) => a[1].localeCompare(b[1]));
+
+            sortedEmployees.forEach(([id, name]) => {
+                filter.innerHTML += `<option value="${id}">${name}</option>`;
+            });
+
+            filter.addEventListener('change', () => {
+                displayTimecards();
+                displaySchedules();
+            });
+        }
+
+        function displayManagerInfo(manager) {
+            const container = document.getElementById('manager-info');
+            if (!manager) {
+                container.innerHTML = `<p class="text-red-500">No manager found.</p>`;
+                return;
+            }
+            container.innerHTML = `
+                <p><strong>Name:</strong> ${manager.name}</p>
+                <p><strong>Manager ID:</strong> ${manager.manager_id}</p>
+                <p><strong>Manages:</strong> ${manager.employee_ids?.length || 0} employees</p>
+            `;
+        }
+
+        function displayEmployees(employees) {
+            const container = document.getElementById('employees-table');
+            let table = `<table class="min-w-full divide-y divide-gray-200"><thead class="bg-gray-50"><tr><th class="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th><th class="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employee ID</th></tr></thead><tbody class="bg-white divide-y divide-gray-200">`;
+            employees.sort((a, b) => a.name.localeCompare(b.name)).forEach(emp => {
+                table += `<tr><td class="py-4 px-6">${emp.name}</td><td class="py-4 px-6 font-mono text-sm">${emp.employee_id}</td></tr>`;
+            });
+            table += `</tbody></table>`;
+            container.innerHTML = table;
+        }
+
+        function setupTimecardFilter() {
+            const payPeriods = [...new Set(allTimecards.map(tc => tc.pay_period_end))].sort();
+            const filter = document.getElementById('payPeriodFilter');
+            filter.innerHTML = `<option value="all">All Pay Periods</option>`;
+            payPeriods.forEach(p => {
+                filter.innerHTML += `<option value="${p}">${p}</option>`;
+            });
+            filter.addEventListener('change', displayTimecards);
+        }
+
+        function displayTimecards() {
+            const payPeriodFilterValue = document.getElementById('payPeriodFilter').value;
+            const employeeFilterValue = document.getElementById('employeeFilter').value;
+
+            let filteredData = allTimecards;
+
+            if (payPeriodFilterValue !== 'all') {
+                filteredData = filteredData.filter(tc => tc.pay_period_end === payPeriodFilterValue);
+            }
+            if (employeeFilterValue !== 'all') {
+                filteredData = filteredData.filter(tc => tc.employee_id === employeeFilterValue);
+            }
+
+
+            const container = document.getElementById('timecards-table');
+            let table = `<table class="min-w-full divide-y divide-gray-200"><thead class="bg-gray-50"><tr>
+                <th class="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employee</th>
+                <th class="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pay Period End</th>
+                <th class="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th class="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Exception</th>
+                <th class="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reason</th>
+                </tr></thead><tbody class="bg-white divide-y divide-gray-200">`;
+            
+            filteredData.sort((a,b) => (employeeMap.get(a.employee_id) || '').localeCompare(employeeMap.get(b.employee_id) || ''))
+            .forEach(tc => {
+                const statusBadge = {
+                    'submitted': `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Submitted</span>`,
+                    'approved': `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Approved</span>`,
+                    'not submitted': `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Not Submitted</span>`,
+                }[tc.status] || `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">${tc.status}</span>`;
+
+                const exceptionBadge = tc.has_exception 
+                    ? `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Yes</span>`
+                    : `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">No</span>`;
+                
+                table += `<tr>
+                    <td class="py-4 px-6">${employeeMap.get(tc.employee_id) || tc.employee_id}</td>
+                    <td class="py-4 px-6">${tc.pay_period_end}</td>
+                    <td class="py-4 px-6">${statusBadge}</td>
+                    <td class="py-4 px-6">${exceptionBadge}</td>
+                    <td class="py-4 px-6">${tc.exception_reason || 'N/A'}</td>
+                </tr>`;
+            });
+            table += `</tbody></table>`;
+            container.innerHTML = table;
+        }
+
+        function setupScheduleFilter() {
+            const months = [...new Set(allSchedules.map(s => `${s.year}-${s.month.toString().padStart(2,'0')}`))]
+                .sort()
+                .map(m => ({ value: m, text: new Date(m + '-02').toLocaleString('default', { month: 'long', year: 'numeric' }) }));
+            const filter = document.getElementById('scheduleMonthFilter');
+            filter.innerHTML = `<option value="all">Select a Month</option>`;
+            months.forEach(m => {
+                filter.innerHTML += `<option value="${m.value}">${m.text}</option>`;
+            });
+            filter.addEventListener('change', displaySchedules);
+        }
+
+        function displaySchedules() {
+            const monthFilterValue = document.getElementById('scheduleMonthFilter').value;
+            const employeeFilterValue = document.getElementById('employeeFilter').value;
+            const container = document.getElementById('schedules-table');
+
+            if (monthFilterValue === 'all') {
+                container.innerHTML = '<p class="p-4 text-gray-500">Please select a month to view the schedule planner.</p>';
+                return;
+            }
+
+            const [year, month] = monthFilterValue.split('-').map(Number);
+            const daysInMonth = new Date(year, month, 0).getDate();
+
+            let gridHTML = `<div class="schedule-grid" id="schedule-grid-container">`;
+
+            gridHTML += '<div class="schedule-header employee-name-cell">Employee</div>';
+            for (let day = 1; day <= daysInMonth; day++) {
+                gridHTML += `<div class="schedule-header">${day}</div>`;
+            }
+            
+            let employeesToDisplay = [...employeeMap.entries()];
+            if (employeeFilterValue !== 'all') {
+                employeesToDisplay = employeesToDisplay.filter(([id, name]) => id === employeeFilterValue);
+            }
+            
+            const sortedEmployees = employeesToDisplay.sort((a, b) => a[1].localeCompare(b[1]));
+
+            for (const [empId, empName] of sortedEmployees) {
+                gridHTML += `<div class="employee-name-cell">${empName}</div>`;
+
+                const scheduleData = allSchedules.find(s => s.employee_id === empId && s.year === year && s.month === month);
+
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const dateStr = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+                    const shift = scheduleData?.daily_shifts?.[dateStr];
+
+                    if (shift) {
+                        gridHTML += `<div class="schedule-cell shift-cell">${shift}</div>`;
+                    } else {
+                        gridHTML += `<div class="schedule-cell"></div>`;
+                    }
+                }
+            }
+
+            gridHTML += '</div>';
+            container.innerHTML = gridHTML;
+            
+            // Apply the dynamic grid column style
+            const gridContainer = document.getElementById('schedule-grid-container');
+            if (gridContainer) {
+                gridContainer.style.gridTemplateColumns = `150px repeat(${daysInMonth}, minmax(100px, 1fr))`;
+            }
+        }
+
+    </script>
+</body>
+</html>
