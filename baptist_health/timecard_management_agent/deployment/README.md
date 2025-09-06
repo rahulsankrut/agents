@@ -1,132 +1,110 @@
-adk w# Deployment Guide: Baptist Health Timecard Management Agent
+# Timecard Management Agent Deployment
 
-This guide explains how to deploy the timecard management agent to Google Cloud Agent Engine.
+This directory contains deployment scripts for the Baptist Health Timecard Management Agent to Google Cloud Agent Engine.
 
 ## Prerequisites
 
-1. **Google Cloud CLI**: Install and authenticate with gcloud
+1. **Google Cloud Project**: Ensure you have a GCP project with Agent Engine API enabled
+2. **Authentication**: Run `gcloud auth application-default login`
+3. **Permissions**: Ensure your account has the necessary permissions for Agent Engine
+4. **Python Environment**: Use the virtual environment in `../venv/`
+
+## Environment Setup
+
+1. Copy `env.template` to `.env`:
    ```bash
-   # Install gcloud CLI (if not already installed)
-   # Follow: https://cloud.google.com/sdk/docs/install
-   
-   # Authenticate
-   gcloud auth login
-   gcloud config set project agent-space-465923
+   cp env.template .env
    ```
 
-2. **Required APIs**: The deployment script will enable these automatically:
-   - `aiplatform.googleapis.com` - Vertex AI
-   - `agentengine.googleapis.com` - Agent Engine
-   - `firestore.googleapis.com` - Firestore
+2. Update `.env` with your project settings:
+   ```bash
+   GOOGLE_CLOUD_PROJECT=your-project-id
+   GOOGLE_CLOUD_LOCATION=us-central1
+   GOOGLE_CLOUD_STORAGE_BUCKET=your-project-id-adk-timecard-staging
+   GOOGLE_GENAI_USE_VERTEXAI=1
+   AGENT_MODEL=gemini-2.5-pro
+   AGENT_NAME=Spark_v2
+   ```
 
-3. **Permissions**: Ensure your account has the following roles:
-   - `roles/aiplatform.admin`
-   - `roles/firestore.admin`
-   - `roles/serviceusage.serviceUsageAdmin`
+## Deployment Commands
 
-## Deployment
-
-### Option 1: Automated Deployment (Recommended)
-
+### Quick Deployment
 ```bash
-cd timecard_management_agent/deployment
-python deploy.py
-```
-
-This script will:
-- ✅ Check prerequisites
-- ✅ Enable required APIs
-- ✅ Deploy the agent to Agent Engine
-- ✅ Verify deployment status
-
-### Option 2: Manual Deployment
-
-```bash
-# Enable required APIs
-gcloud services enable aiplatform.googleapis.com --project=agent-space-465923
-gcloud services enable agentengine.googleapis.com --project=agent-space-465923
-gcloud services enable firestore.googleapis.com --project=agent-space-465923
+# Activate the virtual environment
+source ../venv/bin/activate
 
 # Deploy the agent
-gcloud ai agents deploy timecard_management_agent \
-    --project=agent-space-465923 \
-    --location=us-central1 \
-    --display-name="Baptist Health Timecard Management Agent" \
-    --description="AI agent for Baptist Health timecard management. Helps managers efficiently review, approve, and manage employee timecards." \
-    --agent-uri=./timecard_management_agent \
-    --async
+python deploy.py --create
 ```
 
-## Agent Configuration
+### Advanced Deployment Options
+```bash
+# Deploy with custom project and location
+python deploy.py --create --project_id your-project-id --location us-central1
 
-The deployed agent will have:
-- **Agent ID**: `timecard_management_agent`
-- **Display Name**: "Baptist Health Timecard Management Agent"
-- **Project**: `agent-space-465923`
-- **Location**: `us-central1`
-- **Model**: Gemini 2.5 Pro
-- **Tools**: 6 core timecard management tools
+# List all deployed agents
+python deploy.py --list
+
+# Delete an agent
+python deploy.py --delete --resource_id projects/PROJECT_ID/locations/LOCATION/reasoningEngines/AGENT_ID
+```
+
+### Test Deployment
+```bash
+# Test the deployment setup
+python test_deployment.py
+```
+
+## Deployment Process
+
+1. **Build Package**: The deployment script builds a wheel package from the agent code
+2. **Upload to Cloud Storage**: The package is uploaded to the staging bucket
+3. **Create Agent Engine**: The agent is deployed to Agent Engine with all dependencies
+4. **Test Connection**: A test session is created to verify the deployment
 
 ## Verification
 
-Check deployment status:
+After deployment, you can verify the agent is working:
+
 ```bash
-gcloud ai agents describe timecard_management_agent \
-    --project=agent-space-465923 \
-    --location=us-central1
+# Test the deployed agent
+python verify_deployment.py --project your-project-id --agent-name Spark_v2
 ```
-
-## Accessing the Agent
-
-Once deployed, you can access the agent through:
-1. **Google Cloud Console**: Vertex AI > Agent Engine
-2. **Agent Engine API**: Direct API calls
-3. **Custom UI**: Integrate into your applications
-
-## Demo Setup
-
-Before running demos:
-1. **Generate Data**: Run `python synthetic_data_generator.py`
-2. **Reset Between Demos**: Run `python reset_demo_data.py`
-3. **Test Agent**: Use the demo scenarios in the README
 
 ## Troubleshooting
 
-### Common Issues:
+### Common Issues
 
-1. **Authentication Error**:
-   ```bash
-   gcloud auth login
-   gcloud auth application-default login
-   ```
+1. **Authentication Errors**: Ensure you're authenticated with `gcloud auth application-default login`
+2. **Permission Errors**: Check that your account has Agent Engine permissions
+3. **Package Build Errors**: Ensure all dependencies are installed in the virtual environment
+4. **Storage Bucket Errors**: Create the staging bucket if it doesn't exist
 
-2. **Permission Denied**:
-   - Ensure you have the required IAM roles
-   - Contact your Google Cloud admin
+### Logs
 
-3. **API Not Enabled**:
-   - The deployment script should handle this automatically
-   - Manual: `gcloud services enable [api-name]`
+Check the deployment logs for detailed error information. The deployment script uses DEBUG level logging.
 
-4. **Agent Not Found**:
-   - Check the agent name: `timecard_management_agent`
-   - Verify project and location settings
+## Cleanup
 
-### Logs and Monitoring:
+To clean up resources:
 
 ```bash
-# View agent logs
-gcloud ai agents logs timecard_management_agent \
-    --project=agent-space-465923 \
-    --location=us-central1
+# Delete the deployed agent
+python deploy.py --delete --resource_id projects/PROJECT_ID/locations/LOCATION/reasoningEngines/AGENT_ID
 
-# Monitor agent status
-gcloud ai agents list --project=agent-space-465923 --location=us-central1
+# Delete the staging bucket (optional)
+gsutil rm -r gs://your-project-id-adk-timecard-staging
 ```
 
-## Support
+## Architecture
 
-For issues with:
-- **Deployment**: Check the troubleshooting section above
-- **Agent Functionality**: Review the main README.md
-- **Google Cloud**: Contact Google Cloud Support
+The deployment creates:
+- **Agent Engine**: The main reasoning engine hosting the agent
+- **Cloud Storage Bucket**: Staging bucket for deployment artifacts
+- **IAM Permissions**: Necessary permissions for the agent to access Firestore
+
+## Security
+
+- All sensitive data is stored in environment variables
+- The agent uses service account authentication
+- Firestore access is controlled through IAM permissions

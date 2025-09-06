@@ -111,23 +111,47 @@ timecard_management_agent/
 
 ## Deployment
 
-Deploy to Google Cloud Agent Engine:
+The agent can be deployed to Google Cloud Agent Engine using the deployment scripts in the `../deployment/` directory.
+
+### Quick Deployment
+
 ```bash
-# Deploy the agent
-poetry run python deploy.py --create
+# Navigate to deployment directory
+cd ../deployment
 
-# List deployed agents
-poetry run python deploy.py --list
+# Test deployment setup
+python test_deployment.py
 
-# Delete an agent
-poetry run python deploy.py --delete --resource_id=YOUR_AGENT_ID
+# Deploy the agent (uses current gcloud project)
+python deploy.py
+
+# Deploy with custom project and region
+python deploy.py --project your-project-id --region us-central1
+
+# Deploy with custom agent name
+python deploy.py --agent-name my-timecard-agent --display-name "My Timecard Agent"
 ```
 
-### Test Deployed Agent
+### Verify Deployment
+
 ```bash
-# Test the deployed agent
-poetry run python test_deployed.py
+# Verify the deployment was successful
+python verify_deployment.py --project your-project-id --agent-name baptist-health-timecard-agent
 ```
+
+### Environment Setup
+
+1. Copy `env.template` to `.env` in the deployment directory
+2. Update with your project settings:
+   ```
+   GOOGLE_CLOUD_PROJECT=your-project-id
+   GOOGLE_CLOUD_LOCATION=us-central1
+   GOOGLE_GENAI_USE_VERTEXAI=1
+   AGENT_MODEL=gemini-2.5-pro
+   AGENT_NAME=Spark_v2
+   ```
+
+For detailed deployment instructions, see the [deployment README](../deployment/README.md).
 
 ## Contributing
 

@@ -54,7 +54,7 @@ class Config:
             "GOOGLE_CLOUD_LOCATION", "us-central1"
         ).lower() or self.agent_settings.google_cloud_location
         self.use_vertex_ai: bool = (
-            os.getenv("GOOGLE_GENAI_USE_VERTEXAI", "0") == "1"
+            os.getenv("GOOGLE_GENAI_USE_VERTEXAI", "1") == "1"
         ) or (self.agent_settings.google_genai_use_vertexai == "1")
         
         # Model Configuration
@@ -72,8 +72,10 @@ class Config:
         if not self.agent_settings.database_id:
             raise ValueError("DATABASE_ID environment variable is required")
             
+        # For Agent Engine deployment, assume Vertex AI is available
         if not self.use_vertex_ai:
-            raise ValueError("GOOGLE_GENAI_USE_VERTEXAI must be set to '1' for Vertex AI")
+            logger.warning("GOOGLE_GENAI_USE_VERTEXAI not set to '1', but continuing for Agent Engine deployment")
+            self.use_vertex_ai = True
     
     @property
     def project_location(self) -> str:

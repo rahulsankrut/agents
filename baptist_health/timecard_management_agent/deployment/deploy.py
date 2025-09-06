@@ -1,134 +1,156 @@
-#!/usr/bin/env python3
-"""
-Deployment script for Baptist Health Timecard Management Agent
-Deploys to Google Cloud Agent Engine
-"""
+# Copyright 2025 Baptist Health
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Deployment script for Baptist Health Timecard Management Agent"""
 
 import os
 import sys
-import argparse
-from pathlib import Path
 
 # Add the project root to sys.path
-project_root = os.path.abspath(os.path.dirname(__file__))
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
-def deploy_agent():
-    """Deploy the agent to Agent Engine."""
-    print("🚀 Deploying Baptist Health Timecard Management Agent")
-    print("=" * 60)
-    
-    try:
-        # Import required modules
-        import vertexai
-        from vertexai import agent_engines
-        
-        # Initialize Vertex AI
-        project = os.getenv("GOOGLE_CLOUD_PROJECT", "agent-space-465923")
-        location = os.getenv("GOOGLE_CLOUD_LOCATION", "us-central1")
-        
-        vertexai.init(
-            project=project,
-            location=location
-        )
-        
-        print(f"✅ Initialized Vertex AI with project: {project}")
-        
-        # Create agent engine
-        agent_engine = agent_engines.AgentEngine.create(
-            display_name="Spark_v2",
-            description="Baptist Health Timecard Management Agent using ADK"
-        )
-        
-        print(f"✅ Agent Engine created with ID: {agent_engine.name}")
-        print(f"✅ Agent Engine name: {agent_engine.display_name}")
-        
-        return agent_engine
-        
-    except Exception as e:
-        print(f"❌ Deployment failed: {e}")
-        import traceback
-        traceback.print_exc()
-        return None
+import vertexai
+from absl import app, flags
+from dotenv import load_dotenv
+from timecard_management_agent.agent import root_agent
+from vertexai import agent_engines
+from vertexai.preview.reasoning_engines import AdkApp
 
-def list_agents():
-    """List deployed agents."""
-    print("📋 Listing deployed agents...")
-    
-    try:
-        import vertexai
-        from vertexai import agent_engines
-        
-        # Initialize Vertex AI
-        project = os.getenv("GOOGLE_CLOUD_PROJECT", "agent-space-465923")
-        location = os.getenv("GOOGLE_CLOUD_LOCATION", "us-central1")
-        
-        vertexai.init(
-            project=project,
-            location=location
-        )
-        
-        # List agent engines
-        agent_engines_list = agent_engines.AgentEngine.list()
-        
-        if not agent_engines_list:
-            print("No deployed agents found.")
-            return
-        
-        print(f"Found {len(agent_engines_list)} deployed agents:")
-        for agent in agent_engines_list:
-            print(f"  - Name: {agent.display_name}")
-            print()
-        
-    except Exception as e:
-        print(f"❌ Failed to list agents: {e}")
+FLAGS = flags.FLAGS
+flags.DEFINE_string("project_id", None, "GCP project ID.")
+flags.DEFINE_string("location", None, "GCP location.")
+flags.DEFINE_string("bucket", None, "GCP bucket.")
+flags.DEFINE_string("resource_id", None, "ReasoningEngine resource ID.")
 
-def delete_agent(resource_id):
-    """Delete a deployed agent."""
-    print(f"🗑️  Deleting agent with ID: {resource_id}")
-    
-    try:
-        import vertexai
-        from vertexai import agent_engines
-        
-        # Initialize Vertex AI
-        project = os.getenv("GOOGLE_CLOUD_PROJECT", "agent-space-465923")
-        location = os.getenv("GOOGLE_CLOUD_LOCATION", "us-central1")
-        
-        vertexai.init(
-            project=project,
-            location=location
-        )
-        
-        # Delete agent engine
-        agent_engines.AgentEngine.delete(resource_id)
-        print(f"✅ Agent {resource_id} deleted successfully")
-        
-    except Exception as e:
-        print(f"❌ Failed to delete agent: {e}")
+flags.DEFINE_bool("list", False, "List all agents.")
+flags.DEFINE_bool("create", False, "Creates a new agent.")
+flags.DEFINE_bool("delete", False, "Deletes an existing agent.")
+flags.mark_bool_flags_as_mutual_exclusive(["create", "delete"])
 
-def main():
-    """Main function."""
-    parser = argparse.ArgumentParser(description="Deploy Baptist Health Timecard Management Agent")
-    parser.add_argument("--create", action="store_true", help="Create and deploy agent")
-    parser.add_argument("--list", action="store_true", help="List deployed agents")
-    parser.add_argument("--delete", action="store_true", help="Delete agent")
-    parser.add_argument("--resource_id", type=str, help="Agent resource ID for deletion")
-    
-    args = parser.parse_args()
-    
-    if args.create:
-        deploy_agent()
-    elif args.list:
+
+def create() -> None:
+    """Creates an agent engine for Timecard Management Agent."""
+    adk_app = AdkApp(agent=root_agent, enable_tracing=False)
+
+    # Get environment variables for the deployment
+    project_id = os.getenv("GOOGLE_CLOUD_PROJECT", "agent-space-465923")
+    location = os.getenv("GOOGLE_CLOUD_LOCATION", "us-central1")
+
+    remote_agent = agent_engines.create(
+        adk_app,
+        display_name=root_agent.name,
+        description="AI-powered timecard management agent for Baptist Health",
+        requirements=[
+            "google-adk (>=1.0.0)",
+            "google-cloud-aiplatform[agent_engines] (>=1.91.0,<2.0.0)",
+            "google-genai (>=1.5.0,<2.0.0)",
+            "pydantic (>=2.10.6,<3.0.0)",
+            "pydantic-settings (>=2.8.1)",
+            "python-dotenv (>=1.0.0)",
+            "absl-py (>=2.2.1)",
+            "tabulate (>=0.9.0)",
+            "cloudpickle (>=3.1.1)",
+            "jsonschema (>=4.23.0)",
+            "google-cloud-firestore (>=2.18.0)",
+        ],
+        extra_packages=[
+            "./timecard_management_agent",
+        ],
+        min_instances=0,
+        max_instances=10,
+        container_concurrency=80,
+    )
+    print(f"Created remote agent: {remote_agent.resource_name}")
+    print(f"Agent Engine ID: {remote_agent.resource_name.split('/')[-1]}")
+
+
+def delete(resource_id: str) -> None:
+    """Deletes an existing agent engine."""
+    remote_agent = agent_engines.get(resource_id)
+    remote_agent.delete(force=True)
+    print(f"Deleted remote agent: {resource_id}")
+
+
+def list_agents() -> None:
+    """Lists all deployed agents."""
+    remote_agents = agent_engines.list()
+    template = """
+{agent.name} ("{agent.display_name}")
+- Create time: {agent.create_time}
+- Update time: {agent.update_time}
+- Resource name: {agent.resource_name}
+"""
+    remote_agents_string = "\n".join(
+        template.format(agent=agent) for agent in remote_agents
+    )
+    print(f"All remote agents:\n{remote_agents_string}")
+
+
+def main(argv: list[str]) -> None:
+    del argv  # unused
+    load_dotenv()
+
+    project_id = (
+        FLAGS.project_id
+        if FLAGS.project_id
+        else os.getenv("GOOGLE_CLOUD_PROJECT")
+    )
+    location = (
+        FLAGS.location if FLAGS.location else os.getenv("GOOGLE_CLOUD_LOCATION")
+    )
+    bucket = (
+        FLAGS.bucket
+        if FLAGS.bucket
+        else os.getenv("GOOGLE_CLOUD_STORAGE_BUCKET")
+    )
+
+    print(f"PROJECT: {project_id}")
+    print(f"LOCATION: {location}")
+    print(f"BUCKET: {bucket}")
+
+    if not project_id:
+        print("Missing required environment variable: GOOGLE_CLOUD_PROJECT")
+        return
+    elif not location:
+        print("Missing required environment variable: GOOGLE_CLOUD_LOCATION")
+        return
+    elif not bucket:
+        print(
+            "Missing required environment variable: GOOGLE_CLOUD_STORAGE_BUCKET"
+        )
+        return
+
+    vertexai.init(
+        project=project_id,
+        location=location,
+        staging_bucket=f"gs://{bucket}",
+    )
+
+    if FLAGS.list:
         list_agents()
-    elif args.delete:
-        if not args.resource_id:
-            print("❌ --resource_id is required for deletion")
+    elif FLAGS.create:
+        create()
+    elif FLAGS.delete:
+        if not FLAGS.resource_id:
+            print("resource_id is required for delete")
             return
-        delete_agent(args.resource_id)
+        delete(FLAGS.resource_id)
     else:
-        parser.print_help()
+        print("Unknown command. Use --create, --list, or --delete")
+
 
 if __name__ == "__main__":
-    main()
+    app.run(main)
