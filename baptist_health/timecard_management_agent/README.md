@@ -4,7 +4,7 @@ A sophisticated AI agent built with Google's Agent Development Kit (ADK) to stre
 
 ## Overview
 
-**Spark_v2** is an intelligent timecard management assistant that helps healthcare managers efficiently review, approve, and manage employee timecards. Built specifically for Baptist Health, it transforms hours of manual review into minutes of intelligent interaction.
+**Time Card Agent** is an intelligent timecard management assistant that helps healthcare managers efficiently review, approve, and manage employee timecards. Built specifically for Baptist Health, it transforms hours of manual review into minutes of intelligent interaction.
 
 ## Features
 
@@ -159,7 +159,3 @@ For detailed deployment instructions, see the [deployment README](../deployment/
 2. Add tests for new tools
 3. Update documentation for new features
 4. Ensure proper error handling and logging
-
-## License
-
-Apache License 2.0
