@@ -17,11 +17,21 @@ class FirestoreClient:
         self.database_id = database_id
         self.client = firestore.Client(project=project_id, database=database_id)
         
-    def get_timecards_by_pay_period(self, pay_period_end: str) -> List[Dict[str, Any]]:
-        """Get all timecards for a specific pay period."""
+    def get_timecards_by_pay_period(self, pay_period_end: str, manager_name: Optional[str] = None) -> List[Dict[str, Any]]:
+        """Get all timecards for a specific pay period, optionally filtered by manager."""
         try:
             timecards_ref = self.client.collection('timecards')
             query = timecards_ref.where('pay_period_end', '==', pay_period_end)
+            
+            # If manager_name is provided, filter by manager
+            if manager_name:
+                # First get the manager_id for the given manager_name
+                manager_id = self.get_manager_id_by_name(manager_name)
+                if manager_id:
+                    query = query.where('manager_id', '==', manager_id)
+                else:
+                    logger.warning(f"Manager '{manager_name}' not found, returning all timecards")
+            
             docs = query.stream()
             
             timecards = []
@@ -30,13 +40,33 @@ class FirestoreClient:
                 timecard_data['doc_id'] = doc.id
                 timecards.append(timecard_data)
             
-            logger.info(f"Retrieved {len(timecards)} timecards for pay period {pay_period_end}")
+            logger.info(f"Retrieved {len(timecards)} timecards for pay period {pay_period_end}" + 
+                       (f" for manager {manager_name}" if manager_name else ""))
             return timecards
             
         except Exception as e:
             logger.error(f"Error retrieving timecards for pay period {pay_period_end}: {e}")
             raise
     
+    def get_manager_id_by_name(self, manager_name: str) -> Optional[str]:
+        """Get manager ID by manager name."""
+        try:
+            managers_ref = self.client.collection('managers')
+            query = managers_ref.where('name', '==', manager_name)
+            docs = query.stream()
+            
+            for doc in docs:
+                manager_data = doc.to_dict()
+                logger.info(f"Found manager ID {doc.id} for manager {manager_name}")
+                return doc.id
+            
+            logger.warning(f"Manager '{manager_name}' not found")
+            return None
+            
+        except Exception as e:
+            logger.error(f"Error retrieving manager ID for {manager_name}: {e}")
+            raise
+
     def get_employees_by_manager(self, manager_id: str) -> List[Dict[str, Any]]:
         """Get all employees for a specific manager."""
         try:
@@ -55,6 +85,19 @@ class FirestoreClient:
             
         except Exception as e:
             logger.error(f"Error retrieving employees for manager {manager_id}: {e}")
+            raise
+
+    def get_employees_by_manager_name(self, manager_name: str) -> List[Dict[str, Any]]:
+        """Get all employees for a specific manager by name."""
+        try:
+            manager_id = self.get_manager_id_by_name(manager_name)
+            if not manager_id:
+                return []
+            
+            return self.get_employees_by_manager(manager_id)
+            
+        except Exception as e:
+            logger.error(f"Error retrieving employees for manager {manager_name}: {e}")
             raise
     
     def get_manager_info(self, manager_id: str) -> Optional[Dict[str, Any]]:

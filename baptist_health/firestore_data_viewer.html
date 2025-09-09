@@ -67,6 +67,16 @@
             <h2 class="text-xl font-semibold mb-2 text-yellow-800">Action Required: Enter Your Project ID</h2>
             <p class="text-yellow-700 mb-4">Please paste your Google Cloud Project ID into the box below to connect to Firestore.</p>
             <input type="text" id="projectIdInput" placeholder="your-gcp-project-id" class="w-full p-2 border border-yellow-400 rounded-md focus:ring-2 focus:ring-yellow-500 focus:outline-none">
+            
+            <div class="mt-4">
+                <label for="managerSelect" class="block text-sm font-medium text-yellow-800 mb-2">Select Manager to View:</label>
+                <select id="managerSelect" class="w-full p-2 border border-yellow-400 rounded-md focus:ring-2 focus:ring-yellow-500 focus:outline-none">
+                    <option value="">Select a manager...</option>
+                    <option value="Rahul">Rahul</option>
+                    <option value="Drew">Drew</option>
+                </select>
+            </div>
+            
             <button id="connectButton" class="mt-4 px-4 py-2 bg-yellow-500 text-white font-semibold rounded-md hover:bg-yellow-600 transition-colors">Connect and Load Data</button>
         </div>
 
@@ -79,8 +89,8 @@
 
         <div id="data-display" class="hidden space-y-8">
             <div>
-                <h2 class="text-2xl font-semibold mb-4 border-b pb-2">Manager</h2>
-                <div id="manager-info" class="p-4 bg-white rounded-lg shadow-sm"></div>
+                <h2 class="text-2xl font-semibold mb-4 border-b pb-2">Managers</h2>
+                <div id="managers-info" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
             </div>
 
              <div class="bg-white rounded-lg shadow-sm border">
@@ -128,8 +138,8 @@
                 <h2 class="text-2xl font-semibold mb-4 border-b pb-2">Timecards</h2>
                 <div class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
                     <p class="text-sm text-blue-800">
-                        <strong>Demo Note:</strong> Historical pay periods (Aug 8, 15, 22) show approved timecards. 
-                        Current week (Aug 29) is pending for agent interaction.
+                        <strong>Demo Note:</strong> Historical pay periods (Aug 1, 8, 15, 22, 29) show approved timecards. 
+                        Current week (Sep 5) is pending for agent interaction.
                     </p>
                 </div>
                 <div id="timecard-summary" class="mb-4 p-4 bg-gray-50 rounded-lg">
@@ -165,8 +175,15 @@
 
         connectButton.addEventListener('click', () => {
             const projectId = projectIdInput.value;
+            const selectedManager = document.getElementById('managerSelect').value;
+            
             if (!projectId) {
                 alert('Please enter your Google Cloud Project ID.');
+                return;
+            }
+            
+            if (!selectedManager) {
+                alert('Please select a manager to view.');
                 return;
             }
             
@@ -175,7 +192,7 @@
             try {
                 const app = initializeApp(firebaseConfig);
                 db = getFirestore(app, 'timecard-demo-database');
-                fetchAndDisplayData();
+                fetchAndDisplayData(selectedManager);
             } catch (error) {
                  showError("Failed to initialize Firebase. Check your Project ID and ensure the API is enabled.", error);
             }
@@ -190,7 +207,7 @@
             document.getElementById('data-display').classList.add('hidden');
         }
 
-        async function fetchAndDisplayData() {
+        async function fetchAndDisplayData(selectedManager) {
             document.getElementById('config-section').classList.add('hidden');
             document.getElementById('loader').classList.remove('hidden');
             document.getElementById('error-message').classList.add('hidden');
@@ -203,22 +220,38 @@
                     getDocs(collection(db, "schedules")),
                 ]);
 
-                employeeSnap.docs.forEach(doc => {
-                    const emp = doc.data();
+                // Filter data by selected manager
+                const allManagers = managerSnap.docs.map(d => d.data());
+                const selectedManagerData = allManagers.find(m => m.name === selectedManager);
+                
+                if (!selectedManagerData) {
+                    showError(`Manager '${selectedManager}' not found in database.`);
+                    return;
+                }
+
+                // Filter employees by selected manager
+                const allEmployees = employeeSnap.docs.map(d => d.data());
+                const managerEmployees = allEmployees.filter(emp => emp.manager_id === selectedManagerData.manager_id);
+                
+                managerEmployees.forEach(emp => {
                     employeeMap.set(emp.employee_id, emp.name);
                 });
-                displayEmployees(employeeSnap.docs.map(d => d.data()));
+                displayEmployees(managerEmployees);
 
-                const manager = managerSnap.docs[0]?.data();
-                displayManagerInfo(manager);
+                // Display only the selected manager
+                displayManagersInfo([selectedManagerData]);
 
-                // Setup all filters
+                // Setup all filters (no need for manager filter since we're already filtered)
                 setupEmployeeFilter();
                 
-                allTimecards = timecardSnap.docs.map(d => d.data());
+                // Filter timecards by selected manager
+                const allTimecardsData = timecardSnap.docs.map(d => d.data());
+                allTimecards = allTimecardsData.filter(tc => tc.manager_id === selectedManagerData.manager_id);
                 setupTimecardFilter();
                 
-                allSchedules = scheduleSnap.docs.map(d => d.data());
+                // Filter schedules by selected manager
+                const allSchedulesData = scheduleSnap.docs.map(d => d.data());
+                allSchedules = allSchedulesData.filter(s => s.manager_id === selectedManagerData.manager_id);
                 setupScheduleFilter();
 
                 // Smartly select the current month (Sept 2025 for demo purposes)
@@ -257,6 +290,7 @@
             });
         }
 
+
         function setupEmployeeFilter() {
             const filter = document.getElementById('employeeFilter');
             filter.innerHTML = `<option value="all">All Employees</option>`;
@@ -273,17 +307,24 @@
             });
         }
 
-        function displayManagerInfo(manager) {
-            const container = document.getElementById('manager-info');
-            if (!manager) {
-                container.innerHTML = `<p class="text-red-500">No manager found.</p>`;
+        function displayManagersInfo(managers) {
+            const container = document.getElementById('managers-info');
+            if (!managers || managers.length === 0) {
+                container.innerHTML = `<p class="text-red-500">No managers found.</p>`;
                 return;
             }
-            container.innerHTML = `
-                <p><strong>Name:</strong> ${manager.name}</p>
-                <p><strong>Manager ID:</strong> ${manager.manager_id}</p>
-                <p><strong>Manages:</strong> ${manager.employee_ids?.length || 0} employees</p>
-            `;
+            
+            let managersHTML = '';
+            managers.forEach(manager => {
+                managersHTML += `
+                    <div class="p-4 bg-white rounded-lg shadow-sm border">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">${manager.name}</h3>
+                        <p class="text-sm text-gray-600"><strong>Manager ID:</strong> ${manager.manager_id}</p>
+                        <p class="text-sm text-gray-600"><strong>Team Size:</strong> ${manager.employee_ids?.length || 0} employees</p>
+                    </div>
+                `;
+            });
+            container.innerHTML = managersHTML;
         }
 
         function displayEmployees(employees) {

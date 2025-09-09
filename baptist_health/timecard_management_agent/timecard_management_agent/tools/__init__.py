@@ -1,6 +1,7 @@
 """Tools package for timecard management agent."""
 
 from .tools import (
+    set_manager_context,
     get_summary,
     get_exceptions,
     approve_standard_timecards,
@@ -10,6 +11,7 @@ from .tools import (
 )
 
 __all__ = [
+    "set_manager_context",
     "get_summary",
     "get_exceptions", 
     "approve_standard_timecards",

@@ -6,6 +6,7 @@ from google.adk import Agent
 from .config import Config
 from .prompts import GLOBAL_INSTRUCTION, INSTRUCTION
 from .tools import (
+    set_manager_context,
     get_summary,
     get_exceptions,
     approve_standard_timecards,
@@ -28,6 +29,7 @@ root_agent = Agent(
     instruction=INSTRUCTION,
     name=configs.agent_name,
     tools=[
+        set_manager_context,
         get_summary,
         get_exceptions,
         approve_standard_timecards,

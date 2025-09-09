@@ -6,14 +6,18 @@ import uuid
 # --- Configuration ---
 PROJECT_ID = "agent-space-465923"  
 DATABASE_ID = "timecard-demo-database"
-MANAGER_ID = f"manager_{uuid.uuid4().hex[:8]}"
-NUM_EMPLOYEES = 25
+RAHUL_MANAGER_ID = f"manager_rahul_{uuid.uuid4().hex[:8]}"
+DREW_MANAGER_ID = f"manager_drew_{uuid.uuid4().hex[:8]}"
+NUM_EMPLOYEES_PER_MANAGER = 20
 EMPLOYEE_NAMES = [
     "Olivia Chen", "Benjamin Carter", "Sophia Rodriguez", "Liam Goldberg", "Ava Nguyen",
     "Noah Williams", "Isabella Martinez", "Mason Garcia", "Harper Thompson", "Ethan Moore",
     "Evelyn White", "Alexander Hall", "Mia Lewis", "James Walker", "Charlotte Green",
     "William Clark", "Amelia Hill", "Michael Scott", "Emily Baker", "David Adams",
-    "Jessica Wright", "Chris Martinez", "Ashley Davis", "Kevin Harris", "Sarah Wilson"
+    "Jessica Wright", "Chris Martinez", "Ashley Davis", "Kevin Harris", "Sarah Wilson",
+    "Daniel Brown", "Lisa Johnson", "Robert Taylor", "Jennifer Anderson", "Christopher Lee",
+    "Michelle Garcia", "Andrew Wilson", "Stephanie Moore", "Matthew Davis", "Nicole Jackson",
+    "Ryan Thompson", "Amanda White", "Joshua Harris", "Rachel Martin", "Brandon Young"
 ]
 
 def get_db_client():
@@ -35,37 +39,65 @@ def clear_collection(db, collection_name):
         doc.reference.delete()
 
 def seed_manager_and_employees(db):
-    """Creates a manager and a list of employees who report to them."""
-    print("Seeding manager and employees...")
+    """Creates two managers and employees who report to them."""
+    print("Seeding managers and employees...")
     employees_ref = db.collection('employees')
-    manager_ref = db.collection('managers').document(MANAGER_ID)
+    managers_ref = db.collection('managers')
 
-    employee_ids = []
     batch = db.batch()
+    all_employee_ids = []
 
-    for i in range(NUM_EMPLOYEES):
-        emp_id = f"emp_{uuid.uuid4().hex[:8]}"
-        employee_ids.append(emp_id)
+    # Create Rahul's team (first 20 employees)
+    rahul_employee_ids = []
+    for i in range(NUM_EMPLOYEES_PER_MANAGER):
+        emp_id = f"emp_rahul_{uuid.uuid4().hex[:8]}"
+        rahul_employee_ids.append(emp_id)
+        all_employee_ids.append(emp_id)
         emp_doc_ref = employees_ref.document(emp_id)
         batch.set(emp_doc_ref, {
             'employee_id': emp_id,
             'name': EMPLOYEE_NAMES[i],
-            'manager_id': MANAGER_ID
+            'manager_id': RAHUL_MANAGER_ID
         })
 
-    batch.set(manager_ref, {
-        'manager_id': MANAGER_ID,
-        'name': 'Jenica',
-        'employee_ids': employee_ids
+    # Create Drew's team (next 20 employees)
+    drew_employee_ids = []
+    for i in range(NUM_EMPLOYEES_PER_MANAGER, NUM_EMPLOYEES_PER_MANAGER * 2):
+        emp_id = f"emp_drew_{uuid.uuid4().hex[:8]}"
+        drew_employee_ids.append(emp_id)
+        all_employee_ids.append(emp_id)
+        emp_doc_ref = employees_ref.document(emp_id)
+        batch.set(emp_doc_ref, {
+            'employee_id': emp_id,
+            'name': EMPLOYEE_NAMES[i],
+            'manager_id': DREW_MANAGER_ID
+        })
+
+    # Create Rahul manager document
+    rahul_manager_ref = managers_ref.document(RAHUL_MANAGER_ID)
+    batch.set(rahul_manager_ref, {
+        'manager_id': RAHUL_MANAGER_ID,
+        'name': 'Rahul',
+        'employee_ids': rahul_employee_ids
+    })
+
+    # Create Drew manager document
+    drew_manager_ref = managers_ref.document(DREW_MANAGER_ID)
+    batch.set(drew_manager_ref, {
+        'manager_id': DREW_MANAGER_ID,
+        'name': 'Drew',
+        'employee_ids': drew_employee_ids
     })
 
     batch.commit()
-    print(f"Seeded 1 manager and {NUM_EMPLOYEES} employees.")
-    return employee_ids
+    print(f"Seeded 2 managers and {NUM_EMPLOYEES_PER_MANAGER * 2} employees.")
+    print(f"Rahul: {len(rahul_employee_ids)} employees")
+    print(f"Drew: {len(drew_employee_ids)} employees")
+    return all_employee_ids
 
-def seed_timecards(db, manager_id):
+def seed_timecards(db, manager_id, manager_name):
     """Creates timecard entries for all employees for multiple pay periods."""
-    print("Seeding timecards...")
+    print(f"Seeding timecards for {manager_name}...")
     timecards_ref = db.collection('timecards')
     employees_ref = db.collection('employees')
     
@@ -74,10 +106,12 @@ def seed_timecards(db, manager_id):
     employee_docs = list(employees_query)
 
     pay_periods = [
+        "2025-08-01",
         "2025-08-08",
         "2025-08-15",
         "2025-08-22",
-        "2025-08-29"
+        "2025-08-29",
+        "2025-09-05"
     ]
 
     batch = db.batch()
@@ -113,20 +147,20 @@ def seed_timecards(db, manager_id):
                     ])
                 
                 # Determine status and approval data based on pay period
-                if pay_period in ["2025-08-08", "2025-08-15", "2025-08-22"]:
+                if pay_period in ["2025-08-01", "2025-08-08", "2025-08-15", "2025-08-22", "2025-08-29"]:
                     # Past pay periods - most should be approved
                     if not has_exception:
                         # Standard timecards from past periods should be approved
                         status = 'approved'
                         approved_at = f"{pay_period} 16:00:00"  # End of pay period
-                        approved_by = 'Jenica'
+                        approved_by = manager_name
                     else:
                         # Exceptions from past periods - 70% resolved, 30% still pending
                         status = 'approved' if random.random() > 0.3 else 'submitted'
                         approved_at = f"{pay_period} 16:00:00" if status == 'approved' else None
-                        approved_by = 'Jenica' if status == 'approved' else None
+                        approved_by = manager_name if status == 'approved' else None
                 else:
-                    # Current week (2025-08-29) - keep pending for demo
+                    # Current week (2025-09-05) - keep pending for demo
                     status = 'submitted'
                     approved_at = None
                     approved_by = None
@@ -151,9 +185,9 @@ def seed_timecards(db, manager_id):
     batch.commit()
     print(f"Seeded timecards for {len(employee_docs)} employees across {len(pay_periods)} pay periods.")
 
-def seed_schedules(db, manager_id):
+def seed_schedules(db, manager_id, manager_name):
     """Creates monthly schedule documents for all employees."""
-    print("Seeding schedules for August and September...")
+    print(f"Seeding schedules for {manager_name}...")
     schedules_ref = db.collection('schedules')
     employees_ref = db.collection('employees')
 
@@ -162,7 +196,7 @@ def seed_schedules(db, manager_id):
 
     batch = db.batch()
 
-    for year, month in [(2025, 8), (2025, 9)]:
+    for year, month in [(2025, 9), (2025, 10)]:
         for emp_doc in employee_docs:
             schedule_doc_id = f"{emp_doc.id}_{year}_{month}"
             schedule_doc_ref = schedules_ref.document(schedule_doc_id)
@@ -221,8 +255,10 @@ def main():
 
     # Seed new data
     seed_manager_and_employees(db)
-    seed_timecards(db, MANAGER_ID)
-    seed_schedules(db, MANAGER_ID)
+    seed_timecards(db, RAHUL_MANAGER_ID, 'Rahul')
+    seed_timecards(db, DREW_MANAGER_ID, 'Drew')
+    seed_schedules(db, RAHUL_MANAGER_ID, 'Rahul')
+    seed_schedules(db, DREW_MANAGER_ID, 'Drew')
 
     print("\n--- Seeding Complete! ---")
     print(f"Your Firestore database '{DATABASE_ID}' in project '{PROJECT_ID}' has been populated.")

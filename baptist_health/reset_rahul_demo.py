@@ -17,48 +17,39 @@ def get_db_client():
         print(f"and that your project ID '{PROJECT_ID}' is correct.")
         raise e
 
-def get_manager_choice():
-    """Prompts user to select which manager to reset."""
-    print("\nWhich manager's current week timecards would you like to reset?")
-    print("1. Rahul")
-    print("2. Drew")
-    print("3. Both managers")
-    
-    while True:
-        choice = input("Enter your choice (1, 2, or 3): ").strip()
-        if choice in ['1', '2', '3']:
-            return choice
-        print("Invalid choice. Please enter 1, 2, or 3.")
-
-def get_manager_info(db, manager_name):
-    """Gets manager information from the database."""
+def get_rahul_manager_info(db):
+    """Gets Rahul's manager information from the database."""
     managers_ref = db.collection('managers')
-    managers_query = managers_ref.where('name', '==', manager_name).stream()
+    managers_query = managers_ref.where('name', '==', 'Rahul').stream()
     manager_docs = list(managers_query)
     
     if not manager_docs:
-        print(f"Error: No manager found with name '{manager_name}'")
+        print("Error: Rahul not found in database.")
         return None
     
     return manager_docs[0].to_dict()
 
-def reset_current_week_timecards(db, manager_id, manager_name):
-    """Resets the current week (2025-09-05) timecards back to original state for a specific manager."""
-    print(f"Resetting current week timecards for {manager_name}...")
+def reset_rahul_current_week_timecards(db):
+    """Resets Rahul's current week (2025-09-05) timecards back to original state."""
+    print("Resetting Rahul's current week timecards...")
+    
+    rahul_info = get_rahul_manager_info(db)
+    if not rahul_info:
+        return
     
     timecards_ref = db.collection('timecards')
     employees_ref = db.collection('employees')
     
-    # Get all employees for this manager
-    employees_query = employees_ref.where('manager_id', '==', manager_id).stream()
+    # Get all employees for Rahul
+    employees_query = employees_ref.where('manager_id', '==', rahul_info['manager_id']).stream()
     employee_docs = list(employees_query)
     
     if not employee_docs:
-        print(f"No employees found for manager {manager_name}!")
+        print("No employees found for Rahul!")
         return
     
-    # Delete existing timecards for current week for this manager
-    current_week_query = timecards_ref.where('pay_period_end', '==', '2025-09-05').where('manager_id', '==', manager_id)
+    # Delete existing timecards for current week for Rahul
+    current_week_query = timecards_ref.where('pay_period_end', '==', '2025-09-05').where('manager_id', '==', rahul_info['manager_id'])
     current_week_docs = current_week_query.stream()
     
     batch = db.batch()
@@ -68,7 +59,7 @@ def reset_current_week_timecards(db, manager_id, manager_name):
         deleted_count += 1
     
     batch.commit()
-    print(f"Deleted {deleted_count} existing timecards for current week for {manager_name}.")
+    print(f"Deleted {deleted_count} existing timecards for current week for Rahul.")
     
     # Recreate timecards for current week with original distribution
     batch = db.batch()
@@ -81,7 +72,7 @@ def reset_current_week_timecards(db, manager_id, manager_name):
             # Create a "not submitted" timecard record
             timecard_data = {
                 'employee_id': emp_doc.id,
-                'manager_id': manager_id,
+                'manager_id': rahul_info['manager_id'],
                 'pay_period_end': '2025-09-05',
                 'status': 'not submitted',
                 'has_exception': True,
@@ -111,7 +102,7 @@ def reset_current_week_timecards(db, manager_id, manager_name):
             
             timecard_data = {
                 'employee_id': emp_doc.id,
-                'manager_id': manager_id,
+                'manager_id': rahul_info['manager_id'],
                 'pay_period_end': '2025-09-05',
                 'status': status,
                 'has_exception': has_exception,
@@ -128,52 +119,31 @@ def reset_current_week_timecards(db, manager_id, manager_name):
         created_count += 1
     
     batch.commit()
-    print(f"Created {created_count} new timecards for current week for {manager_name}.")
-    print(f"✅ Demo reset complete for {manager_name}! Current week is ready for agent interaction.")
+    print(f"Created {created_count} new timecards for current week for Rahul.")
+    print("✅ Rahul's demo reset complete! Current week is ready for agent interaction.")
 
 def main():
-    """Main function to reset demo data."""
-    print("--- Demo Reset Script ---")
-    print("This will reset the current week (2025-09-05) timecards to their original state.")
+    """Main function to reset Rahul's demo data."""
+    print("--- Rahul's Demo Reset Script ---")
+    print("This will reset Rahul's current week (2025-09-05) timecards to their original state.")
     print("Historical data (Aug 1, 8, 15, 22, 29) will remain unchanged.")
+    print("Drew's data will remain completely untouched.")
     
-    confirmation = input("Are you sure you want to reset the current week? (y/n): ")
+    confirmation = input("Are you sure you want to reset Rahul's current week? (y/n): ")
     if confirmation.lower() != 'y':
         print("Reset cancelled.")
         return
 
     db = get_db_client()
+    reset_rahul_current_week_timecards(db)
     
-    # Get manager choice
-    choice = get_manager_choice()
-    
-    if choice == '1':  # Rahul
-        rahul_info = get_manager_info(db, 'Rahul')
-        if rahul_info:
-            reset_current_week_timecards(db, rahul_info['manager_id'], 'Rahul')
-    
-    elif choice == '2':  # Drew
-        drew_info = get_manager_info(db, 'Drew')
-        if drew_info:
-            reset_current_week_timecards(db, drew_info['manager_id'], 'Drew')
-    
-    elif choice == '3':  # Both managers
-        rahul_info = get_manager_info(db, 'Rahul')
-        drew_info = get_manager_info(db, 'Drew')
-        
-        if rahul_info:
-            reset_current_week_timecards(db, rahul_info['manager_id'], 'Rahul')
-        
-        if drew_info:
-            reset_current_week_timecards(db, drew_info['manager_id'], 'Drew')
-    
-    print("\n--- Reset Complete! ---")
-    print("Current week timecards are now ready for the next demo.")
-    print("Expected distribution:")
-    print("- ~36 submitted timecards (32 standard, 4 with exceptions)")
-    print("- ~4 not submitted timecards")
+    print("\n--- Rahul's Reset Complete! ---")
+    print("Rahul's current week timecards are now ready for the next demo.")
+    print("Expected distribution for Rahul's team:")
+    print("- ~18 submitted timecards (16 standard, 2 with exceptions)")
+    print("- ~2 not submitted timecards")
     print("- All pending approval (no approved_at/approved_by data)")
-    print("- Total: 40 employees across 2 managers (Rahul and Drew)")
+    print("- Total: 20 employees for Rahul")
 
 if __name__ == '__main__':
     main()

@@ -20,7 +20,7 @@ class AgentSettings(BaseSettings):
     """Agent configuration settings."""
     
     # Agent identity
-    name: str = "Spark_v2"
+    name: str = "TimeCardAgent"
     model: str = "gemini-2.5-pro"
     
     # Firestore configuration
@@ -62,7 +62,7 @@ class Config:
             "AGENT_MODEL", "gemini-2.5-pro"
         ) or self.agent_settings.model
         self.agent_name: str = os.getenv(
-            "AGENT_NAME", "Spark_v2"
+            "AGENT_NAME", "TimeCardAgent"
         ) or self.agent_settings.name
         
         # Validate required environment variables

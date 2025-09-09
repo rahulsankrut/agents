@@ -11,6 +11,9 @@ from ..config import Config
 logger = logging.getLogger(__name__)
 config = Config()
 
+# Global manager context - this will be set once and used throughout the session
+_current_manager = None
+
 
 def get_db_client() -> FirestoreClient:
     """Get Firestore client instance."""
@@ -20,30 +23,89 @@ def get_db_client() -> FirestoreClient:
     )
 
 
-def get_summary(pay_period_end: str) -> Dict[str, Any]:
+def set_manager_context(manager_name: str) -> Dict[str, Any]:
     """
-    Get a summary of timecards for a specific pay period.
+    Set the current manager context for the session.
+    
+    Args:
+        manager_name: The name of the manager (e.g., "Rahul" or "Drew")
+    
+    Returns:
+        Dictionary containing confirmation of the manager context
+    """
+    global _current_manager
+    
+    try:
+        db = get_db_client()
+        
+        # Verify the manager exists
+        manager_id = db.get_manager_id_by_name(manager_name)
+        if not manager_id:
+            return {
+                "status": "error",
+                "message": f"Manager '{manager_name}' not found in the system. Available managers are: Rahul, Drew",
+                "current_manager": _current_manager
+            }
+        
+        # Set the global context
+        _current_manager = manager_name
+        
+        # Get some basic info about the manager's team
+        employees = db.get_employees_by_manager_name(manager_name)
+        
+        return {
+            "status": "success",
+            "message": f"Manager context set to {manager_name}. You now have access to {len(employees)} employees.",
+            "current_manager": _current_manager,
+            "team_size": len(employees),
+            "manager_id": manager_id
+        }
+        
+    except Exception as e:
+        logger.error(f"Error setting manager context for {manager_name}: {e}")
+        return {
+            "status": "error",
+            "message": f"Error setting manager context: {str(e)}",
+            "current_manager": _current_manager
+        }
+
+
+def get_current_manager() -> Optional[str]:
+    """Get the current manager context."""
+    return _current_manager
+
+
+def get_summary(pay_period_end: str, manager_name: Optional[str] = None) -> Dict[str, Any]:
+    """
+    Get a summary of timecards for a specific pay period and manager.
     
     Args:
         pay_period_end: The pay period end date (YYYY-MM-DD format)
+        manager_name: The name of the manager (e.g., "Rahul" or "Drew"). If not provided, uses current manager context.
     
     Returns:
         Dictionary containing summary statistics and breakdown
     """
     try:
+        # Use provided manager_name or fall back to current context
+        effective_manager = manager_name or _current_manager
+        
         db = get_db_client()
-        timecards = db.get_timecards_by_pay_period(pay_period_end)
+        timecards = db.get_timecards_by_pay_period(pay_period_end, effective_manager)
         
         if not timecards:
+            manager_msg = f" for manager {effective_manager}" if effective_manager else ""
             return {
                 "status": "no_data",
-                "message": f"No timecards found for pay period ending {pay_period_end}",
+                "message": f"No timecards found for pay period ending {pay_period_end}{manager_msg}",
                 "summary": {}
             }
         
         # Get employee names for mapping
-        employees = db.get_employees_by_manager("manager_id")  # We'll get the manager ID from first timecard
-        if timecards:
+        if effective_manager:
+            employees = db.get_employees_by_manager_name(effective_manager)
+        else:
+            # Fallback to getting manager ID from first timecard
             manager_id = timecards[0].get('manager_id')
             employees = db.get_employees_by_manager(manager_id)
         
@@ -107,34 +169,43 @@ def get_summary(pay_period_end: str) -> Dict[str, Any]:
         }
 
 
-def get_exceptions(pay_period_end: str) -> Dict[str, Any]:
+def get_exceptions(pay_period_end: str, manager_name: Optional[str] = None) -> Dict[str, Any]:
     """
     Get detailed information about timecards with exceptions.
     
     Args:
         pay_period_end: The pay period end date (YYYY-MM-DD format)
+        manager_name: The name of the manager (e.g., "Rahul" or "Drew"). If not provided, uses current manager context.
     
     Returns:
         Dictionary containing exception details
     """
     try:
+        # Use provided manager_name or fall back to current context
+        effective_manager = manager_name or _current_manager
+        
         db = get_db_client()
-        timecards = db.get_timecards_by_pay_period(pay_period_end)
+        timecards = db.get_timecards_by_pay_period(pay_period_end, effective_manager)
         
         if not timecards:
+            manager_msg = f" for manager {effective_manager}" if effective_manager else ""
             return {
                 "status": "no_data",
-                "message": f"No timecards found for pay period ending {pay_period_end}",
+                "message": f"No timecards found for pay period ending {pay_period_end}{manager_msg}",
                 "exceptions": []
             }
         
         # Get employee names for mapping
-        if timecards:
-            manager_id = timecards[0].get('manager_id')
-            employees = db.get_employees_by_manager(manager_id)
+        if effective_manager:
+            employees = db.get_employees_by_manager_name(effective_manager)
             employee_map = {emp['employee_id']: emp['name'] for emp in employees}
         else:
-            employee_map = {}
+            if timecards:
+                manager_id = timecards[0].get('manager_id')
+                employees = db.get_employees_by_manager(manager_id)
+                employee_map = {emp['employee_id']: emp['name'] for emp in employees}
+            else:
+                employee_map = {}
         
         # Filter for exceptions
         exceptions = [tc for tc in timecards if tc.get('has_exception', False)]
@@ -183,24 +254,29 @@ def get_exceptions(pay_period_end: str) -> Dict[str, Any]:
         }
 
 
-def approve_standard_timecards(pay_period_end: str) -> Dict[str, Any]:
+def approve_standard_timecards(pay_period_end: str, manager_name: Optional[str] = None) -> Dict[str, Any]:
     """
-    Approve all standard timecards (submitted with no exceptions) for a pay period.
+    Approve all standard timecards (submitted with no exceptions) for a pay period and manager.
     
     Args:
         pay_period_end: The pay period end date (YYYY-MM-DD format)
+        manager_name: The name of the manager (e.g., "Rahul" or "Drew"). If not provided, uses current manager context.
     
     Returns:
         Dictionary containing approval results
     """
     try:
+        # Use provided manager_name or fall back to current context
+        effective_manager = manager_name or _current_manager
+        
         db = get_db_client()
-        timecards = db.get_timecards_by_pay_period(pay_period_end)
+        timecards = db.get_timecards_by_pay_period(pay_period_end, effective_manager)
         
         if not timecards:
+            manager_msg = f" for manager {effective_manager}" if effective_manager else ""
             return {
                 "status": "no_data",
-                "message": f"No timecards found for pay period ending {pay_period_end}",
+                "message": f"No timecards found for pay period ending {pay_period_end}{manager_msg}",
                 "approved_count": 0
             }
         
@@ -211,26 +287,32 @@ def approve_standard_timecards(pay_period_end: str) -> Dict[str, Any]:
         ]
         
         if not standard_timecards:
+            manager_msg = f" for manager {effective_manager}" if effective_manager else ""
             return {
                 "status": "no_standard_timecards",
-                "message": f"No standard timecards found for pay period ending {pay_period_end}",
+                "message": f"No standard timecards found for pay period ending {pay_period_end}{manager_msg}",
                 "approved_count": 0
             }
         
         # Get timecard IDs to approve
         timecard_ids = [tc['doc_id'] for tc in standard_timecards]
         
+        # Use the effective manager or fall back to config
+        approved_by = effective_manager if effective_manager else config.agent_settings.manager_name
+        
         # Approve the timecards
-        success = db.approve_timecards(timecard_ids, config.agent_settings.manager_name)
+        success = db.approve_timecards(timecard_ids, approved_by)
         
         if success:
+            manager_msg = f" for manager {manager_name}" if manager_name else ""
             return {
                 "status": "success",
                 "pay_period_end": pay_period_end,
+                "manager_name": manager_name,
                 "approved_count": len(timecard_ids),
-                "approved_by": config.agent_settings.manager_name,
+                "approved_by": approved_by,
                 "approved_at": datetime.now().isoformat(),
-                "message": f"Successfully approved {len(timecard_ids)} standard timecards for pay period ending {pay_period_end}"
+                "message": f"Successfully approved {len(timecard_ids)} standard timecards for pay period ending {pay_period_end}{manager_msg}"
             }
         else:
             return {
@@ -289,23 +371,27 @@ def get_employee_schedule(employee_id: str, year: int, month: int) -> Dict[str, 
         }
 
 
-def get_historical_comparison(current_period: str, comparison_period: str) -> Dict[str, Any]:
+def get_historical_comparison(current_period: str, comparison_period: str, manager_name: Optional[str] = None) -> Dict[str, Any]:
     """
     Compare two pay periods to show trends.
     
     Args:
         current_period: Current pay period end date (YYYY-MM-DD)
         comparison_period: Comparison pay period end date (YYYY-MM-DD)
+        manager_name: The name of the manager (e.g., "Rahul" or "Drew"). If not provided, uses current manager context.
     
     Returns:
         Dictionary containing comparison data
     """
     try:
+        # Use provided manager_name or fall back to current context
+        effective_manager = manager_name or _current_manager
+        
         db = get_db_client()
         
         # Get timecards for both periods
-        current_timecards = db.get_timecards_by_pay_period(current_period)
-        comparison_timecards = db.get_timecards_by_pay_period(comparison_period)
+        current_timecards = db.get_timecards_by_pay_period(current_period, effective_manager)
+        comparison_timecards = db.get_timecards_by_pay_period(comparison_period, effective_manager)
         
         # Calculate statistics for current period
         current_exceptions = len([tc for tc in current_timecards if tc.get('has_exception', False)])
@@ -355,41 +441,42 @@ def get_historical_comparison(current_period: str, comparison_period: str) -> Di
         }
 
 
-def draft_reminder_message(employee_ids: List[str], pay_period_end: str) -> Dict[str, Any]:
+def draft_reminder_message(employee_ids: List[str], pay_period_end: str, manager_name: Optional[str] = None) -> Dict[str, Any]:
     """
     Draft a reminder message for employees who haven't submitted timecards.
     
     Args:
         employee_ids: List of employee IDs to send reminders to
         pay_period_end: The pay period end date
+        manager_name: The name of the manager (e.g., "Rahul" or "Drew"). If not provided, uses current manager context.
     
     Returns:
         Dictionary containing the drafted message
     """
     try:
+        # Use provided manager_name or fall back to current context
+        effective_manager = manager_name or _current_manager
+        
         db = get_db_client()
         
-        # Get manager ID from any employee (they all have the same manager)
-        employees = db.get_employees_by_manager("manager_id")  # This will be empty, let's get it differently
-        
-        # Get all employees to find the manager ID
-        all_employees = db.get_employees_by_manager("manager_id")
-        if not all_employees:
-            # Try to get employees from a different approach
+        # Get employee names for the effective manager
+        if effective_manager:
+            all_employees = db.get_employees_by_manager_name(effective_manager)
+            employee_map = {emp['employee_id']: emp['name'] for emp in all_employees}
+            employee_names = [employee_map.get(emp_id, emp_id) for emp_id in employee_ids]
+        else:
+            # Fallback: try to get employees from timecards
             timecards = db.get_timecards_by_pay_period(pay_period_end)
             if timecards:
                 manager_id = timecards[0].get('manager_id')
                 all_employees = db.get_employees_by_manager(manager_id)
-        
-        if not all_employees:
-            # Fallback: use the manager name from config
-            employee_names = employee_ids  # Use IDs as names if we can't get real names
-            manager_name = config.agent_settings.manager_name
-        else:
-            # Create employee name mapping
-            employee_map = {emp['employee_id']: emp['name'] for emp in all_employees}
-            employee_names = [employee_map.get(emp_id, emp_id) for emp_id in employee_ids]
-            manager_name = config.agent_settings.manager_name
+                employee_map = {emp['employee_id']: emp['name'] for emp in all_employees}
+                employee_names = [employee_map.get(emp_id, emp_id) for emp_id in employee_ids]
+                effective_manager = config.agent_settings.manager_name
+            else:
+                # Final fallback: use IDs as names
+                employee_names = employee_ids
+                effective_manager = config.agent_settings.manager_name
         
         # Build the message
         message = f"""
@@ -404,7 +491,7 @@ If you have any questions or need assistance, please don't hesitate to reach out
 Thank you for your attention to this matter.
 
 Best regards,
-{manager_name}
+{effective_manager}
         """.strip()
         
         return {
@@ -412,6 +499,7 @@ Best regards,
             "employee_ids": employee_ids,
             "employee_names": employee_names,
             "pay_period_end": pay_period_end,
+            "manager_name": effective_manager,
             "message": message,
             "subject": f"Timecard Reminder - Pay Period Ending {pay_period_end}"
         }
