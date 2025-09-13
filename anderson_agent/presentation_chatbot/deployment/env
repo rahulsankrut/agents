@@ -13,7 +13,7 @@ GOOGLE_CLOUD_LOCATION=us-central1
 GOOGLE_CLOUD_STORAGE_BUCKET=anderson-agent-presentation-chatbot
 
 # Optional: Agent Engine resource ID (will be set after deployment)
-AGENT_ENGINE_ID=
+AGENT_ENGINE_ID=6584196684517998592
 
 # Optional: Default user ID for testing
 DEFAULT_USER_ID=admin@rahulsankrut.altostrat.com

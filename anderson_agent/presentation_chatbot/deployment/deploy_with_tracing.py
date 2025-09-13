@@ -48,27 +48,21 @@ def create() -> None:
 
     remote_agent = agent_engines.create(
         adk_app,
-        display_name=root_agent.name,
-        description="AI-powered presentation chatbot that helps create PowerPoint presentations with GCS storage",
+        display_name="presentation_chatbot",
         requirements=[
-            "google-adk (>=1.0.0)",
-            "google-cloud-aiplatform[agent_engines] (>=1.91.0,<2.0.0)",
+            "google-adk (>=1.5.0,<2.0.0)",
+            "google-cloud-aiplatform[adk,agent-engines] (>=1.100.0,<2.0.0)",
             "google-genai (>=1.5.0,<2.0.0)",
             "pydantic (>=2.10.6,<3.0.0)",
-            "pydantic-settings (>=2.8.1)",
-            "tabulate (>=0.9.0)",
-            "cloudpickle (>=3.1.1)",
-            "jsonschema (>=4.23.0)",
+            "python-dotenv",
             "requests (>=2.31.0)",
-            "absl-py (>=2.2.1,<3.0.0)",
             "google-cloud-storage (>=2.0.0)",
+            "google-cloud-firestore (>=2.0.0)",
         ],
         extra_packages=[
             "./presentation_chatbot",
+            "./anderson_datastore",
         ],
-        min_instances=0,
-        max_instances=10,
-        container_concurrency=80,
     )
     print(f"Created remote agent: {remote_agent.resource_name}")
     print(f"Agent Engine ID: {remote_agent.resource_name.split('/')[-1]}")

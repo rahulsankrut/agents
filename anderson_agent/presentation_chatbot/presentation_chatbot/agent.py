@@ -2,11 +2,14 @@
 
 import logging
 import warnings
-from google.adk import Agent
+from google.adk.agents import Agent
 from .config import config
 from .prompts import GLOBAL_INSTRUCTION, INSTRUCTION
 from .tools.tools_enhanced import (
     generate_presentation,
+    generate_multi_slide_presentation,
+    create_weekly_presentation,
+    list_customers,
     get_presentation_templates,
     list_presentations,
 )
@@ -21,12 +24,15 @@ logger = logging.getLogger(__name__)
 
 
 root_agent = Agent(
-    model=config.agent_model,
+    name="presentation_chatbot",
+    model="gemini-2.5-pro",
     global_instruction=GLOBAL_INSTRUCTION,
     instruction=INSTRUCTION,
-    name=config.agent_name,
     tools=[
         generate_presentation,
+        generate_multi_slide_presentation,
+        create_weekly_presentation,
+        list_customers,
         get_presentation_templates,
         list_presentations,
     ],
