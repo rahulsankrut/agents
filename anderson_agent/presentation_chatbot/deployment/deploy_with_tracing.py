@@ -48,7 +48,7 @@ def create() -> None:
 
     remote_agent = agent_engines.create(
         adk_app,
-        display_name="presentation_chatbot",
+        display_name="presentation_chatbot_v2",
         requirements=[
             "google-adk (>=1.5.0,<2.0.0)",
             "google-cloud-aiplatform[adk,agent-engines] (>=1.100.0,<2.0.0)",
