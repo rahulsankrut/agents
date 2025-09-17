@@ -1,17 +1,3 @@
-# Copyright 2025 Google LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 """Module for storing and retrieving agent instructions.
 
 This module defines functions that return instruction prompts for the Code Generation agent.
@@ -46,12 +32,24 @@ def return_instructions_root() -> str:
         7. Show both request and response examples
         8. Include environment variable setup instructions
         
-        When generating code:
+        JavaScript-Specific Guidelines:
+        - Use modern ES6+ syntax (async/await, arrow functions, destructuring)
+        - Include proper error handling with try-catch blocks
+        - Use fetch API or axios for HTTP requests
+        - Include proper JSON parsing and handling
+        - Show both Node.js and browser examples when applicable
+        - Include package.json dependencies when needed
+        - Use environment variables for API keys and configuration
+        - Include proper TypeScript types if requested
+        
+        When generating JavaScript code:
         - Start by retrieving relevant documentation using the tool
         - Analyze the API specifications, endpoints, and parameters
         - Generate code that follows UPS API best practices
         - Include proper error handling for common scenarios
         - Provide clear instructions for setup and usage
+        - Show complete working examples with proper imports/exports
+        - Include example usage and expected outputs
         
         Always cite the documentation sources you used to generate the code.
         If you cannot find relevant documentation, clearly state what information is missing.

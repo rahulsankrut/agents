@@ -40,6 +40,7 @@ def convert_firestore_to_cloud_function_format(project):
     
     return {
         "title": project.project_title,
+        "customer_name": project.customer_name,
         "logo_gcs_url": logo_gcs_url,
         "text_content": [project.project_overview],
         "image_data": image_data,

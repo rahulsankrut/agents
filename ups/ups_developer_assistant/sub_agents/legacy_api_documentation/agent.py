@@ -43,7 +43,7 @@ ask_vertex_retrieval = VertexAiRagRetrieval(
 )
 
 legacy_api_documentation_agent = Agent(
-    model='gemini-2.5-flash',
+    model='gemini-2.5-pro',
     name='legacy_api_documentation_agent',
     instruction=return_instructions_root(),
     tools=[

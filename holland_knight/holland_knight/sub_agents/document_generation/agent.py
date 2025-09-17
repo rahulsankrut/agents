@@ -6,7 +6,7 @@ from holland_knight.sub_agents.document_generation import prompt
 
 
 document_generation_agent = Agent(
-    model="gemini-2.5-flash",
+    model="gemini-2.5-pro",
     name="document_generation_agent",
     description="Specialized agent for generating legal documents and contracts",
     instruction=prompt.DOCUMENT_GENERATION_INSTR,

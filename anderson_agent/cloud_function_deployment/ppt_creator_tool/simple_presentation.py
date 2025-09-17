@@ -40,9 +40,29 @@ def create_simple_presentation(title, logo_path=None, text_content=None, image_d
     # Add logo outside and to the left of the title box if provided
     if logo_path and os.path.exists(logo_path):
         try:
-            # Add logo outside the title box, positioned to the left
-            slide.shapes.add_picture(logo_path, Inches(0.2), Inches(2.1), Inches(0.8), Inches(0.8))
-            print(f"✅ Added logo: {logo_path}")
+            # Get original logo dimensions to maintain aspect ratio
+            from PIL import Image
+            with Image.open(logo_path) as img:
+                original_width, original_height = img.size
+                aspect_ratio = original_width / original_height
+            
+            # Define maximum dimensions for the logo
+            max_width = Inches(0.8)
+            max_height = Inches(0.8)
+            
+            # Calculate dimensions maintaining aspect ratio
+            if max_width / max_height > aspect_ratio:
+                # Height is the limiting factor
+                new_height = max_height
+                new_width = new_height * aspect_ratio
+            else:
+                # Width is the limiting factor
+                new_width = max_width
+                new_height = new_width / aspect_ratio
+            
+            # Add logo with maintained aspect ratio
+            slide.shapes.add_picture(logo_path, Inches(0.2), Inches(2.1), new_width, new_height)
+            print(f"✅ Added logo: {logo_path} (maintained aspect ratio: {new_width:.2f}\" x {new_height:.2f}\")")
             
             # Add slide sub-header image beside the logo ONLY if EQI is included
             if include_eqi:
@@ -122,7 +142,7 @@ def create_simple_presentation(title, logo_path=None, text_content=None, image_d
     title_p = title_frame.paragraphs[0]
     title_p.text = title
     title_p.font.name = 'Calibri'
-    title_p.font.size = Pt(24)
+    title_p.font.size = Pt(19.2)
     title_p.font.bold = True
     title_p.font.color.rgb = RGBColor(0, 51, 102)  # Dark blue text
     title_p.alignment = PP_ALIGN.CENTER
@@ -157,7 +177,7 @@ def create_simple_presentation(title, logo_path=None, text_content=None, image_d
     heading_p = heading_frame.paragraphs[0]
     heading_p.text = "Project Overview/Callouts"
     heading_p.font.name = 'Calibri'
-    heading_p.font.size = Pt(16)
+    heading_p.font.size = Pt(12.8)
     heading_p.font.bold = True
     heading_p.font.color.rgb = RGBColor(0, 0, 0)
     heading_p.alignment = PP_ALIGN.LEFT
@@ -188,7 +208,7 @@ def create_simple_presentation(title, logo_path=None, text_content=None, image_d
                     line = '• ' + line
                 p.text = line
                 p.font.name = 'Calibri'
-                p.font.size = Pt(14)
+                p.font.size = Pt(11.2)
                 p.font.color.rgb = RGBColor(0, 0, 0)
                 p.alignment = PP_ALIGN.LEFT
     else:
@@ -196,7 +216,7 @@ def create_simple_presentation(title, logo_path=None, text_content=None, image_d
         default_p = text_content_frame.paragraphs[0]
         default_p.text = "• Add your project content here\n• Use bullet points for clarity\n• Include key information"
         default_p.font.name = 'Calibri'
-        default_p.font.size = Pt(14)
+        default_p.font.size = Pt(11.2)
         default_p.font.color.rgb = RGBColor(0, 0, 0)
     
     # Create right rectangle box for images
@@ -260,7 +280,7 @@ def create_simple_presentation(title, logo_path=None, text_content=None, image_d
                         title_p = title_frame.paragraphs[0]
                         title_p.text = image_title
                         title_p.font.name = 'Calibri'
-                        title_p.font.size = Pt(12)
+                        title_p.font.size = Pt(9.6)
                         title_p.font.bold = True
                         title_p.font.color.rgb = RGBColor(0, 0, 0)
                         title_p.alignment = PP_ALIGN.CENTER
@@ -296,7 +316,7 @@ def create_simple_presentation(title, logo_path=None, text_content=None, image_d
         placeholder_p = placeholder_frame.paragraphs[0]
         placeholder_p.text = "Images"
         placeholder_p.font.name = 'Calibri'
-        placeholder_p.font.size = Pt(14)
+        placeholder_p.font.size = Pt(11.2)
         placeholder_p.font.color.rgb = RGBColor(128, 128, 128)
         placeholder_p.alignment = PP_ALIGN.CENTER
     
@@ -307,7 +327,7 @@ def create_simple_presentation(title, logo_path=None, text_content=None, image_d
     footer_p = footer_frame.paragraphs[0]
     footer_p.text = "Add your footer text here"
     footer_p.font.name = 'Calibri'
-    footer_p.font.size = Pt(10)
+    footer_p.font.size = Pt(8)
     footer_p.font.color.rgb = RGBColor(128, 128, 128)
     footer_p.alignment = PP_ALIGN.CENTER
     
@@ -331,7 +351,7 @@ def create_text_header(slide):
     header_text_p = header_text_frame.paragraphs[0]
     header_text_p.text = "Project Header"
     header_text_p.font.name = 'Calibri'
-    header_text_p.font.size = Pt(24)
+    header_text_p.font.size = Pt(19.2)
     header_text_p.font.bold = True
     header_text_p.font.color.rgb = RGBColor(0, 51, 102)
     header_text_p.alignment = PP_ALIGN.CENTER
@@ -355,7 +375,7 @@ def add_image_placeholder(slide, x, y, width, height, label):
     placeholder_p = placeholder_frame.paragraphs[0]
     placeholder_p.text = label
     placeholder_p.font.name = 'Calibri'
-    placeholder_p.font.size = Pt(12)
+    placeholder_p.font.size = Pt(9.6)
     placeholder_p.font.color.rgb = RGBColor(128, 128, 128)
     placeholder_p.alignment = PP_ALIGN.CENTER
 

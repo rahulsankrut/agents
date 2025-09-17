@@ -7,7 +7,7 @@ from holland_knight.tools import court_listener_search
 
 
 legal_qa_agent = Agent(
-    model="gemini-2.5-flash",
+    model="gemini-2.5-pro",
     name="legal_qa_agent",
     description="Specialized agent for answering legal questions and researching case law",
     instruction=prompt.LEGAL_QA_INSTR,

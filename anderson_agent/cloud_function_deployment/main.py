@@ -131,6 +131,7 @@ def process_multiple_projects_data(data: dict) -> list:
                 raise ValueError(f"Title is required for project {i+1}")
             
             # Extract parameters
+            customer_name = project.get('customer_name', '')
             logo_gcs_url = project.get('logo_gcs_url')
             text_content = project.get('text_content', [])
             image_data = project.get('image_data', [])
@@ -165,6 +166,7 @@ def process_multiple_projects_data(data: dict) -> list:
             # Create processed project data
             processed_project = {
                 'title': title,
+                'customer_name': customer_name,
                 'logo_path': processed_logo_path,
                 'text_content': text_content,
                 'image_data': processed_image_data,
@@ -176,6 +178,13 @@ def process_multiple_projects_data(data: dict) -> list:
         except Exception as e:
             logger.error(f"Error processing project {i+1}: {e}")
             raise ValueError(f"Error processing project {i+1}: {str(e)}")
+    
+    # Sort projects by customer name for consistent ordering
+    processed_projects.sort(key=lambda x: x.get('customer_name', '').lower())
+    
+    logger.info(f"Processed and sorted {len(processed_projects)} projects by customer name")
+    for project in processed_projects:
+        logger.info(f"  - {project.get('customer_name', 'Unknown')}: {project.get('title', 'No title')}")
     
     return processed_projects
 
