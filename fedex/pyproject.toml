@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "fedex-market-intelligence"
+version = "0.1.0"
+description = "FedEx Market Intelligence Agent - Site selection and market analysis using shipping data"
+authors = ["Your Name <your.email@example.com>"]
+readme = "README.md"
+packages = [{include = "fedex_market_intelligence"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+google-adk = "^1.0.0"
+google-cloud-bigquery = "^3.11.0"
+google-cloud-aiplatform = "^1.38.0"
+pandas = "^2.1.0"
+numpy = "^1.24.0"
+requests = "^2.31.0"
+faker = "^20.0.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.0"
+black = "^23.0.0"
+flake8 = "^6.0.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
