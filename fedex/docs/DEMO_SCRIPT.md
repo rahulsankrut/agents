@@ -36,13 +36,16 @@ Let's see how our agent helps her make this critical decision."
 
 ---
 
-## Demo Walkthrough (6-7 minutes)
+## Demo Walkthrough (8-10 minutes)
 
 ### **Scenario A: Retail Expansion (Sarah Chen - TechFlow Electronics)**
-*[Original scenario - 3 minutes]*
+*[Retail expansion scenario - 2.5 minutes]*
 
 ### **Scenario B: Consumer Trend Prediction (Marcus Rodriguez - TrendSpot Analytics)**
-*[New scenario - 3-4 minutes]*
+*[Trend prediction scenario - 2.5 minutes]*
+
+### **Scenario C: Inventory Management (Jennifer Park - Seasonal Supply Co.)**
+*[Inventory optimization scenario - 3 minutes]*
 
 ---
 
@@ -191,6 +194,83 @@ Let's see how our agent helps Marcus identify the next big skincare trend."
 
 ---
 
+## Demo Walkthrough - Scenario C (3 minutes)
+
+### **"Meet Jennifer Park, VP of Operations"**
+*[Switch to new demo environment]*
+
+"Now let's meet Jennifer Park, VP of Operations at Seasonal Supply Co., a major distributor of outdoor gear and seasonal products. Jennifer's challenge is one that every retailer faces: **inventory management**.
+
+Her problem: Seasonal Supply Co. has been struggling with overstock in some categories and stockouts in others. Last year, they had $2M in excess winter gear inventory while running out of popular items during peak season. Traditional inventory planning relies on historical sales data, but that doesn't account for changing consumer behavior and market trends.
+
+Let's see how our agent helps Jennifer optimize her inventory strategy using real-time shipping data."
+
+### Scene 1: Seasonal Pattern Analysis (1 minute)
+
+**Jennifer's Query:**
+> "Show me the seasonal patterns for outdoor gear shipments across different regions. I need to understand when demand peaks and valleys occur."
+
+*[Show seasonal analysis with month-over-month trends]*
+
+**Key Points to Highlight:**
+- Clear seasonal patterns with peak and valley months
+- Regional variations in seasonal timing
+- Year-over-year growth trends
+- Specific months for inventory planning
+
+**Presenter Commentary:**
+"Notice how the agent reveals not just when demand peaks, but also regional variations. This is crucial for inventory planning - what works in California might not work in New York."
+
+### Scene 2: Inventory Optimization (1 minute)
+
+**Jennifer's Follow-up:**
+> "Based on these patterns, when should I start building inventory for winter outerwear, and how much should I plan for the Northeast vs the West Coast?"
+
+*[Show forecasting and regional demand analysis]*
+
+**Key Points to Highlight:**
+- Optimal inventory build-up timing
+- Regional demand variations
+- Quantified demand forecasts
+- Risk mitigation strategies
+
+**Presenter Commentary:**
+"This is where the agent becomes incredibly valuable for operations. Jennifer can now plan her inventory with confidence, knowing exactly when to order and how much to stock for each region."
+
+### Scene 3: Competitive Intelligence (1 minute)
+
+**Jennifer's Strategic Question:**
+> "I'm concerned about competition. Which outdoor gear categories have the highest competition, and where should I focus to avoid overstock situations?"
+
+*[Show competitive analysis and market share data]*
+
+**Key Points to Highlight:**
+- Market saturation analysis
+- Competitive landscape by category
+- Opportunity identification
+- Risk assessment
+
+**Presenter Commentary:**
+"Now Jennifer has a complete picture: seasonal patterns, regional demand, and competitive landscape. This allows her to make data-driven inventory decisions that minimize risk and maximize profitability."
+
+### Scene 4: Strategic Recommendations (1 minute)
+
+**Jennifer's Final Request:**
+> "Give me a complete inventory strategy for the next 12 months based on this analysis."
+
+*[Show comprehensive inventory strategy]*
+
+**Key Points to Highlight:**
+- 12-month inventory roadmap
+- Category-specific recommendations
+- Regional allocation strategy
+- Risk mitigation plans
+
+**Presenter Commentary:**
+"The agent doesn't just provide data - it provides a complete operational strategy. Jennifer can now optimize her inventory across all categories and regions, reducing costs while improving customer satisfaction."
+
+---
+
 ## Key Value Propositions (2 minutes)
 
 ### "What Just Happened Here?"
@@ -199,21 +279,25 @@ Let's see how our agent helps Marcus identify the next big skincare trend."
 - "What traditionally takes 3-6 months of market research happened in under 10 minutes"
 - "Real-time access to the world's largest shipping database"
 - "Predict consumer trends before they become mainstream"
+- "Optimize inventory planning with seasonal forecasting"
 
 **2. Competitive Advantage**
 - "You're making decisions based on actual consumer behavior, not surveys or estimates"
 - "Identify market gaps before your competitors do"
 - "Launch products with confidence in emerging trends"
+- "Avoid overstock and stockouts with predictive inventory management"
 
 **3. Risk Mitigation**
 - "Data-driven decisions reduce expansion risk"
 - "Forecast demand before committing capital"
 - "Optimize inventory and marketing spend based on real demand"
+- "Minimize inventory costs while maximizing customer satisfaction"
 
 **4. Scalability**
 - "Analyze any market, any product category, any time period"
 - "Scale from single location to nationwide expansion strategy"
-- "From retail expansion to product development to marketing optimization"
+- "From retail expansion to product development to inventory optimization"
+- "From trend prediction to operational efficiency"
 
 ---
 
@@ -226,6 +310,9 @@ Let's see how our agent helps Marcus identify the next big skincare trend."
 
 **Consumer Trend Prediction:**
 - "A skincare brand used our trend analysis to launch a clean beauty line 6 months ahead of competitors, capturing 35% market share in the first year"
+
+**Inventory Management:**
+- "A seasonal supply company used our forecasting to optimize inventory planning, reducing overstock by 40% and stockouts by 60% while improving cash flow by $1.2M"
 
 **Supply Chain Optimization:**
 - "A logistics company optimized their distribution network based on our demand patterns, reducing delivery times by 25%"
@@ -248,6 +335,7 @@ Let's see how our agent helps Marcus identify the next big skincare trend."
 
 - **Expanding into new markets** (like Sarah at TechFlow Electronics)
 - **Predicting consumer trends** (like Marcus at TrendSpot Analytics)
+- **Optimizing inventory management** (like Jennifer at Seasonal Supply Co.)
 - **Optimizing your supply chain**
 - **Developing new products**
 - **Creating targeted marketing campaigns**
@@ -284,6 +372,13 @@ Let's discuss how the FedEx Market Intelligence Agent can transform your busines
 3. "Which skincare product categories are seeing the fastest growth in shipments across major metro areas?"
 4. "Compare the seasonal patterns for jewelry and accessories between New York and Los Angeles"
 5. "Identify emerging trends in vitamins and supplements in high-growth markets"
+
+**Scenario C - Inventory Management:**
+1. "Show me the seasonal patterns for outdoor gear shipments across different regions"
+2. "When should I start building inventory for winter outerwear in the Northeast vs the West Coast?"
+3. "Which outdoor gear categories have the highest competition and risk of overstock?"
+4. "Give me a 12-month inventory strategy for garden supplies based on seasonal demand"
+5. "Compare the inventory planning needs for pet supplies between urban and suburban markets"
 
 ### Technical Notes:
 - Agent Engine ID: `6031502975560581120`
