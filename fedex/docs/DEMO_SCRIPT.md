@@ -128,18 +128,18 @@ Let's see how our agent helps Marcus identify the next big skincare trend."
 ### Scene 1: Trend Analysis (1.5 minutes)
 
 **Marcus's Query:**
-> "Which skincare product categories are seeing the fastest growth in shipments to millennial-heavy zip codes?"
+> "Which skincare product categories are seeing the fastest growth in shipments across major metro areas?"
 
 *[Show agent response with trend analysis]*
 
 **Key Points to Highlight:**
 - Agent analyzes multiple product categories simultaneously
-- Identifies specific demographic correlations
+- Identifies specific geographic growth patterns
 - Shows growth rates and velocity metrics
-- Provides geographic distribution of trends
+- Provides metro area distribution of trends
 
 **Presenter Commentary:**
-"Notice how the agent is analyzing not just what's selling, but where it's selling and to whom. This is real-time consumer behavior data that traditional market research can't capture."
+"Notice how the agent is analyzing not just what's selling, but where it's selling and how fast it's growing. This is real-time consumer behavior data that traditional market research can't capture."
 
 ### Scene 2: Seasonal Forecasting (1.5 minutes)
 
@@ -160,7 +160,7 @@ Let's see how our agent helps Marcus identify the next big skincare trend."
 ### Scene 3: Competitive Intelligence (1 minute)
 
 **Marcus's Strategic Question:**
-> "I need to understand the competitive landscape. Which skincare brands are dominating in these high-growth millennial markets, and where are the gaps?"
+> "I need to understand the competitive landscape. Which skincare brands are dominating in these high-growth metro markets, and where are the gaps?"
 
 *[Show competitive analysis and market share data]*
 
@@ -171,7 +171,7 @@ Let's see how our agent helps Marcus identify the next big skincare trend."
 - Opportunity gap analysis
 
 **Presenter Commentary:**
-"Now Marcus has a complete picture: trending products, target demographics, seasonal patterns, and competitive landscape. This is the kind of intelligence that can make or break a product launch."
+"Now Marcus has a complete picture: trending products, target markets, seasonal patterns, and competitive landscape. This is the kind of intelligence that can make or break a product launch."
 
 ### Scene 4: Strategic Recommendations (1 minute)
 
@@ -281,9 +281,9 @@ Let's discuss how the FedEx Market Intelligence Agent can transform your busines
 **Scenario B - Consumer Trend Prediction:**
 1. "What is the aggregate demand trend for 'winter outerwear' in the Northeast? Show me the year-over-year growth"
 2. "Generate a 6-month demand forecast for 'home fitness equipment' shipments in California and Florida"
-3. "Which skincare product categories are seeing the fastest growth in shipments to millennial-heavy zip codes?"
+3. "Which skincare product categories are seeing the fastest growth in shipments across major metro areas?"
 4. "Compare the seasonal patterns for jewelry and accessories between New York and Los Angeles"
-5. "Identify emerging trends in vitamins and supplements in health-conscious demographics"
+5. "Identify emerging trends in vitamins and supplements in high-growth markets"
 
 ### Technical Notes:
 - Agent Engine ID: `6031502975560581120`
