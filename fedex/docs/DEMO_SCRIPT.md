@@ -38,6 +38,16 @@ Let's see how our agent helps her make this critical decision."
 
 ## Demo Walkthrough (6-7 minutes)
 
+### **Scenario A: Retail Expansion (Sarah Chen - TechFlow Electronics)**
+*[Original scenario - 3 minutes]*
+
+### **Scenario B: Consumer Trend Prediction (Marcus Rodriguez - TrendSpot Analytics)**
+*[New scenario - 3-4 minutes]*
+
+---
+
+## Demo Walkthrough - Scenario A (3 minutes)
+
 ### Scene 1: Initial Market Research (2 minutes)
 
 **Sarah's Query:**
@@ -104,6 +114,83 @@ Let's see how our agent helps her make this critical decision."
 
 ---
 
+## Demo Walkthrough - Scenario B (3-4 minutes)
+
+### **"Meet Marcus Rodriguez, VP of Consumer Insights"**
+*[Switch to new demo environment]*
+
+"Now let's meet Marcus Rodriguez, VP of Consumer Insights at TrendSpot Analytics, a leading market research firm. Marcus helps CPG brands, fashion companies, and marketing agencies predict consumer trends before they happen.
+
+His challenge: A major skincare brand wants to launch a new line targeting millennials, but they need to know which product categories are trending in specific demographic regions. Traditional market research takes months and often misses emerging trends.
+
+Let's see how our agent helps Marcus identify the next big skincare trend."
+
+### Scene 1: Trend Analysis (1.5 minutes)
+
+**Marcus's Query:**
+> "Which skincare product categories are seeing the fastest growth in shipments to millennial-heavy zip codes?"
+
+*[Show agent response with trend analysis]*
+
+**Key Points to Highlight:**
+- Agent analyzes multiple product categories simultaneously
+- Identifies specific demographic correlations
+- Shows growth rates and velocity metrics
+- Provides geographic distribution of trends
+
+**Presenter Commentary:**
+"Notice how the agent is analyzing not just what's selling, but where it's selling and to whom. This is real-time consumer behavior data that traditional market research can't capture."
+
+### Scene 2: Seasonal Forecasting (1.5 minutes)
+
+**Marcus's Follow-up:**
+> "The skincare category looks promising. Can you generate a 6-month demand forecast for skincare products in California and Florida, and show me the seasonal patterns?"
+
+*[Show forecasting and seasonal analysis]*
+
+**Key Points to Highlight:**
+- 6-month demand forecast with confidence intervals
+- Seasonal pattern analysis
+- State-by-state comparison
+- Growth trajectory predictions
+
+**Presenter Commentary:**
+"This is where our agent becomes incredibly powerful for product development. Marcus can now advise his clients on exactly when to launch products, how much inventory to plan, and which markets to prioritize."
+
+### Scene 3: Competitive Intelligence (1 minute)
+
+**Marcus's Strategic Question:**
+> "I need to understand the competitive landscape. Which skincare brands are dominating in these high-growth millennial markets, and where are the gaps?"
+
+*[Show competitive analysis and market share data]*
+
+**Key Points to Highlight:**
+- Market share analysis by brand
+- Identification of underserved segments
+- Competitive positioning insights
+- Opportunity gap analysis
+
+**Presenter Commentary:**
+"Now Marcus has a complete picture: trending products, target demographics, seasonal patterns, and competitive landscape. This is the kind of intelligence that can make or break a product launch."
+
+### Scene 4: Strategic Recommendations (1 minute)
+
+**Marcus's Final Request:**
+> "Based on this analysis, what would you recommend for a skincare brand looking to enter the skincare market?"
+
+*[Show comprehensive strategic recommendations]*
+
+**Key Points to Highlight:**
+- Specific product category recommendations
+- Target market prioritization
+- Launch timing suggestions
+- Marketing strategy insights
+
+**Presenter Commentary:**
+"The agent doesn't just provide data - it provides a complete go-to-market strategy. Marcus can now present his clients with data-driven recommendations that reduce launch risk and maximize success probability."
+
+---
+
 ## Key Value Propositions (2 minutes)
 
 ### "What Just Happened Here?"
@@ -111,18 +198,22 @@ Let's see how our agent helps her make this critical decision."
 **1. Speed to Insight**
 - "What traditionally takes 3-6 months of market research happened in under 10 minutes"
 - "Real-time access to the world's largest shipping database"
+- "Predict consumer trends before they become mainstream"
 
 **2. Competitive Advantage**
 - "You're making decisions based on actual consumer behavior, not surveys or estimates"
 - "Identify market gaps before your competitors do"
+- "Launch products with confidence in emerging trends"
 
 **3. Risk Mitigation**
 - "Data-driven decisions reduce expansion risk"
 - "Forecast demand before committing capital"
+- "Optimize inventory and marketing spend based on real demand"
 
 **4. Scalability**
 - "Analyze any market, any product category, any time period"
 - "Scale from single location to nationwide expansion strategy"
+- "From retail expansion to product development to marketing optimization"
 
 ---
 
@@ -133,8 +224,14 @@ Let's see how our agent helps her make this critical decision."
 **Retail Expansion:**
 - "A major electronics retailer used our insights to identify 3 new markets, resulting in 40% higher first-year sales than their average new store"
 
+**Consumer Trend Prediction:**
+- "A skincare brand used our trend analysis to launch a clean beauty line 6 months ahead of competitors, capturing 35% market share in the first year"
+
 **Supply Chain Optimization:**
 - "A logistics company optimized their distribution network based on our demand patterns, reducing delivery times by 25%"
+
+**Product Development:**
+- "A fashion retailer used our seasonal forecasting to optimize inventory, reducing overstock by 30% while increasing sales by 20%"
 
 **Market Entry Strategy:**
 - "A startup used our competitive analysis to enter markets with 60% less competition, achieving profitability 8 months faster"
@@ -149,9 +246,11 @@ Let's see how our agent helps her make this critical decision."
 
 "The FedEx Market Intelligence Agent isn't just a tool - it's your competitive advantage. Whether you're:
 
-- **Expanding into new markets**
+- **Expanding into new markets** (like Sarah at TechFlow Electronics)
+- **Predicting consumer trends** (like Marcus at TrendSpot Analytics)
 - **Optimizing your supply chain**
-- **Identifying growth opportunities**
+- **Developing new products**
+- **Creating targeted marketing campaigns**
 - **Understanding competitive landscapes**
 
 You now have access to insights that were previously impossible to obtain.
@@ -172,10 +271,19 @@ Let's discuss how the FedEx Market Intelligence Agent can transform your busines
 - [ ] Backup queries prepared in case of issues
 
 ### Demo Queries (Backup):
+
+**Scenario A - Retail Expansion:**
 1. "Show me the top 5 ZIP codes in Texas with the highest growth in electronics shipments"
 2. "Compare electronics demand between Miami and Atlanta metro areas"
 3. "Identify underserved markets for home fitness equipment in the Northeast"
 4. "What's the 6-month forecast for consumer electronics in the Pacific Northwest?"
+
+**Scenario B - Consumer Trend Prediction:**
+1. "What is the aggregate demand trend for 'winter outerwear' in the Northeast? Show me the year-over-year growth"
+2. "Generate a 6-month demand forecast for 'home fitness equipment' shipments in California and Florida"
+3. "Which skincare product categories are seeing the fastest growth in shipments to millennial-heavy zip codes?"
+4. "Compare the seasonal patterns for jewelry and accessories between New York and Los Angeles"
+5. "Identify emerging trends in vitamins and supplements in health-conscious demographics"
 
 ### Technical Notes:
 - Agent Engine ID: `6031502975560581120`
