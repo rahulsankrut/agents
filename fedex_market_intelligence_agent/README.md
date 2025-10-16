@@ -2,8 +2,6 @@
 
 AI-powered market intelligence system that analyzes FedEx shipping data to identify business opportunities and optimal site selection locations. This agent helps businesses make data-driven decisions about where to open new stores, facilities, or services by analyzing real shipping patterns and demand trends.
 
-## 🚀 Quick Start
-
 ### Prerequisites
 
 - Python 3.11 or higher
@@ -103,42 +101,7 @@ The agent includes 7 powerful analysis tools:
 6. **`get_demographics`** - Enrich analysis with Census data (population, income, age)
 7. **`generate_map_visualization`** - Create visual maps of demand zones
 
-## 💡 Example Use Cases
 
-### 1. Site Selection for Retail
-
-**Query**: "Where should I open a pet supply store in Phoenix?"
-
-**Agent Response**: 
-- Analyzes pet supply demand across Phoenix metro area
-- Identifies top ZIP codes with high demand and growth
-- Compares competition levels and market saturation
-- Provides demographic data (income, population)
-- Generates map visualization of opportunities
-
-### 2. Market Expansion Analysis
-
-**Query**: "What's the growth potential for home fitness equipment in Austin?"
-
-**Agent Response**:
-- Shows growth trends and seasonality patterns
-- Compares Austin to other major cities
-- Forecasts future demand (next 6-12 months)
-- Identifies underserved areas within the metro
-
-### 3. Competitive Intelligence
-
-**Query**: "Which cities have the lowest competition for coffee products?"
-
-**Agent Response**:
-- Analyzes market concentration across metro areas
-- Identifies cities with high demand but low competition
-- Shows market share distribution
-- Provides opportunity scores for each location
-
-## 🏗️ Architecture
-
-### Project Structure
 
 ```
 fedex_market_intelligence_agent/
@@ -169,14 +132,6 @@ fedex_market_intelligence_agent/
 └── README.md                          # This file
 ```
 
-### Tech Stack
-
-- **Google Agent Development Kit (ADK)** - Agent framework
-- **Vertex AI** - Cloud AI platform
-- **Gemini 2.5 Pro** - Large language model
-- **BigQuery** - Data warehouse (requires dataset setup)
-- **Google Maps API** - Map visualizations (optional)
-- **Census API** - Demographic data (public, no auth required)
 
 ## 📋 Setup Guide
 
@@ -213,7 +168,7 @@ This package includes **complete data generation capabilities**:
    - `metro_areas.json` - 20+ major US metro areas with ZIP codes
    - `product_categories.json` - 50+ product categories with subcategories
 
-## 🎯 Demo Queries
+## Demo Queries
 
 Try these sample queries with the agent:
 
@@ -234,20 +189,6 @@ Try these sample queries with the agent:
 "Predict demand for winter outerwear in Denver for the next 6 months"
 ```
 
-## 🔧 Configuration
-
-### Environment Variables
-
-| Variable | Description | Required | Default |
-|----------|-------------|----------|---------|
-| `GOOGLE_CLOUD_PROJECT` | Your GCP project ID | Yes | - |
-| `GOOGLE_CLOUD_LOCATION` | GCP region | Yes | us-central1 |
-| `GOOGLE_CLOUD_STORAGE_BUCKET` | GCS bucket for staging | Yes | - |
-| `BIGQUERY_DATASET` | BigQuery dataset name | Yes | fedex_market_intelligence |
-| `ROOT_AGENT_MODEL` | AI model to use | No | gemini-2.5-pro |
-| `MODEL_TEMPERATURE` | Model creativity level | No | 0.1 |
-| `GOOGLE_MAPS_API_KEY` | For map visualizations | No | - |
-| `LOG_LEVEL` | Logging level | No | INFO |
 
 ### Product Categories
 
@@ -274,21 +215,20 @@ The agent supports 50+ product categories. Use the category_id format (lowercase
 - `garden_supplies` - Garden Supplies: seeds, fertilizers, tools
 - `office_supplies` - Office Supplies: paper, pens, notebooks
 
-## 🚀 Deployment
 
-### Local Development
-
+### Local Testing
 ```bash
-# Run agent locally for testing
-python -c "
-from fedex_market_intelligence.agent import root_agent
-print('Agent ready for local testing')
-"
+adk web
 ```
 
 ### Cloud Deployment
 
 ```bash
+
+# Authenticate 
+gcloud auth login
+gcloud auth application-default login
+
 # Deploy to Vertex AI with tracing
 python deployment/deploy_with_tracing.py --create \
   --project_id=your-project-id \
@@ -306,102 +246,3 @@ python deployment/deploy_with_tracing.py --delete \
   --location=us-central1 \
   --resource_id=your-agent-resource-id
 ```
-
-## 📚 Documentation
-
-- **[SETUP_GUIDE.md](SETUP_GUIDE.md)** - Detailed setup instructions
-- **[TECHNICAL_DOCUMENTATION.md](TECHNICAL_DOCUMENTATION.md)** - Architecture and implementation details
-- **[DEMO_SCRIPT.md](DEMO_SCRIPT.md)** - Demo scenarios and example queries
-- **[PROJECT_SUMMARY.md](PROJECT_SUMMARY.md)** - Project overview and features
-
-## 🧪 Testing
-
-```bash
-# Test agent initialization
-python -c "from fedex_market_intelligence.agent import root_agent; print('✅ OK')"
-
-# Test configuration
-python -c "from fedex_market_intelligence.config import config; print(f'Project: {config.project_id}')"
-
-# Test tools import
-python -c "from fedex_market_intelligence.tools import query_shipment_trends; print('✅ Tools OK')"
-
-# Test data generation
-cd data
-python generate_synthetic_data.py --help
-
-# Test BigQuery upload
-python upload_to_bigquery.py --help
-```
-
-## 🔍 Troubleshooting
-
-### Common Issues
-
-1. **"No module named 'google.adk'"**
-   ```bash
-   pip install --upgrade google-adk
-   ```
-
-2. **"Permission denied" on BigQuery**
-   ```bash
-   gcloud auth application-default login
-   ```
-
-3. **"Dataset not found"**
-   - Ensure your BigQuery dataset exists
-   - Check the dataset name in your `.env` file
-   - Verify you have access to the dataset
-
-4. **"No data found for query"**
-   - Check that your BigQuery tables are populated
-   - Verify product category names (use underscore format)
-   - Ensure ZIP codes exist in your data
-
-### Getting Help
-
-1. Check the documentation files in this folder
-2. Verify your environment configuration
-3. Test with simple queries first
-4. Check Google Cloud Console for BigQuery dataset status
-
-## 📄 License
-
-This project is licensed under the Apache License 2.0. See the original project for full license details.
-
-## 🤝 Contributing
-
-This is a shared version of the FedEx Market Intelligence Agent. For the full project with data generation capabilities, please refer to the original repository.
-
----
-
-**Setup Time**: ~15-20 minutes  
-**Dependencies**: Google Cloud account, BigQuery dataset with shipping data  
-**Use Case**: Market intelligence, site selection, demand forecasting, competitive analysis
-
-## 🎯 Next Steps
-
-1. **Set up your environment** using the setup guide
-2. **Generate synthetic data** using the included scripts
-3. **Upload data to BigQuery** automatically
-4. **Deploy the agent** to Vertex AI
-5. **Try the demo queries** to understand capabilities
-6. **Customize for your use case** by modifying categories or adding new tools
-
-## 📦 What's Included
-
-This complete package includes:
-
-- ✅ **Full Agent Code** - All 7 analysis tools and core logic
-- ✅ **Data Generation** - Scripts to create realistic FedEx shipping data
-- ✅ **BigQuery Upload** - Automated data upload and table creation
-- ✅ **Configuration Files** - Metro areas and product categories
-- ✅ **Deployment Scripts** - Cloud deployment with tracing
-- ✅ **Complete Documentation** - Setup guides, technical docs, demo scripts
-- ✅ **Environment Templates** - Ready-to-configure .env template
-
-**Total Setup Time**: ~30 minutes including data generation  
-**Data Size**: ~1GB of synthetic shipping data in BigQuery  
-**Ready to Use**: Complete end-to-end market intelligence system
-
-For questions or support, refer to the comprehensive documentation files included in this package.
