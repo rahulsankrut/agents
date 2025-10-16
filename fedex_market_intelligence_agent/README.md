@@ -180,7 +180,7 @@ fedex_market_intelligence_agent/
 
 ## 📋 Setup Guide
 
-For detailed setup instructions, see [SETUP_GUIDE.md](SETUP_GUIDE.md)
+Follow the step-by-step instructions below to get started.
 
 ### Quick Setup Checklist
 
@@ -213,11 +213,9 @@ This package includes **complete data generation capabilities**:
    - `metro_areas.json` - 20+ major US metro areas with ZIP codes
    - `product_categories.json` - 50+ product categories with subcategories
 
-## 🎯 Demo Scripts
+## 🎯 Demo Queries
 
-See [DEMO_SCRIPT.md](DEMO_SCRIPT.md) for comprehensive demo scenarios and example queries.
-
-### Sample Queries to Try
+Try these sample queries with the agent:
 
 ```bash
 # Basic market analysis
