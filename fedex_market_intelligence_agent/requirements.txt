@@ -1,0 +1,25 @@
+# FedEx Market Intelligence Agent Requirements
+
+# Core dependencies
+google-adk>=1.0.0
+google-cloud-bigquery>=3.11.0
+google-cloud-aiplatform>=1.38.0
+
+# Data processing
+pandas>=2.1.0
+numpy>=1.24.0
+
+# External APIs
+requests>=2.31.0
+
+# Data generation
+faker>=20.0.0
+
+# Configuration
+python-dotenv>=1.0.0
+
+# Development
+pytest>=7.4.0
+black>=23.0.0
+flake8>=6.0.0
+

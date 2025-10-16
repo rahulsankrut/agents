@@ -1,0 +1,170 @@
+{
+  "metro_areas": [
+    {
+      "metro_id": "phoenix_metro",
+      "metro_name": "Phoenix Metro",
+      "state": "AZ",
+      "region": "Southwest",
+      "major_cities": ["Phoenix", "Scottsdale", "Tempe", "Mesa", "Chandler", "Glendale", "Peoria"],
+      "zip_code_samples": ["85001", "85004", "85008", "85012", "85016", "85018", "85020", "85254", "85260", "85262", "85282", "85284", "85286", "85301", "85304", "85308", "85383", "85395"],
+      "population": 4900000,
+      "economic_profile": "growing",
+      "tech_hub": false
+    },
+    {
+      "metro_id": "austin_metro",
+      "metro_name": "Austin Metro",
+      "state": "TX",
+      "region": "Southwest",
+      "major_cities": ["Austin", "Round Rock", "Cedar Park", "Pflugerville", "Georgetown"],
+      "zip_code_samples": ["78701", "78702", "78703", "78704", "78705", "78731", "78745", "78746", "78749", "78750", "78752", "78757", "78758", "78759"],
+      "population": 2300000,
+      "economic_profile": "booming",
+      "tech_hub": true
+    },
+    {
+      "metro_id": "nashville_metro",
+      "metro_name": "Nashville Metro",
+      "state": "TN",
+      "region": "Southeast",
+      "major_cities": ["Nashville", "Franklin", "Murfreesboro", "Brentwood", "Hendersonville"],
+      "zip_code_samples": ["37201", "37203", "37204", "37205", "37206", "37209", "37211", "37212", "37215", "37220", "37228", "37064", "37067", "37130"],
+      "population": 2000000,
+      "economic_profile": "growing",
+      "tech_hub": false
+    },
+    {
+      "metro_id": "chicago_metro",
+      "metro_name": "Chicago Metro",
+      "state": "IL",
+      "region": "Midwest",
+      "major_cities": ["Chicago", "Naperville", "Aurora", "Joliet", "Evanston", "Schaumburg", "Elmhurst", "Glen Ellyn"],
+      "zip_code_samples": ["60601", "60605", "60614", "60622", "60640", "60657", "60126", "60137", "60540", "60563", "60564", "60201"],
+      "population": 9500000,
+      "economic_profile": "stable",
+      "tech_hub": false
+    },
+    {
+      "metro_id": "boston_metro",
+      "metro_name": "Boston Metro",
+      "state": "MA",
+      "region": "Northeast",
+      "major_cities": ["Boston", "Cambridge", "Somerville", "Brookline", "Newton", "Quincy"],
+      "zip_code_samples": ["02101", "02108", "02114", "02115", "02116", "02118", "02120", "02124", "02130", "02134", "02138", "02139", "02140", "02141", "02142", "02145"],
+      "population": 4800000,
+      "economic_profile": "stable",
+      "tech_hub": true
+    },
+    {
+      "metro_id": "los_angeles_metro",
+      "metro_name": "Los Angeles Metro",
+      "state": "CA",
+      "region": "West",
+      "major_cities": ["Los Angeles", "Long Beach", "Glendale", "Santa Monica", "Pasadena", "Torrance", "Burbank"],
+      "zip_code_samples": ["90001", "90012", "90015", "90028", "90036", "90046", "90067", "90210", "90291", "90292", "91101", "91104", "91201", "91204"],
+      "population": 13200000,
+      "economic_profile": "stable",
+      "tech_hub": true
+    },
+    {
+      "metro_id": "nyc_metro",
+      "metro_name": "New York City Metro",
+      "state": "NY",
+      "region": "Northeast",
+      "major_cities": ["Manhattan", "Brooklyn", "Queens", "Bronx", "Jersey City", "Hoboken"],
+      "zip_code_samples": ["10001", "10003", "10011", "10014", "10016", "10018", "10021", "10022", "10023", "10025", "10128", "11201", "11211", "11215", "11222", "11249"],
+      "population": 19500000,
+      "economic_profile": "stable",
+      "tech_hub": true
+    },
+    {
+      "metro_id": "seattle_metro",
+      "metro_name": "Seattle Metro",
+      "state": "WA",
+      "region": "West",
+      "major_cities": ["Seattle", "Bellevue", "Tacoma", "Redmond", "Kirkland", "Renton"],
+      "zip_code_samples": ["98101", "98102", "98103", "98105", "98109", "98112", "98115", "98117", "98122", "98125", "98004", "98005", "98006", "98033", "98052"],
+      "population": 4000000,
+      "economic_profile": "booming",
+      "tech_hub": true
+    },
+    {
+      "metro_id": "san_francisco_metro",
+      "metro_name": "San Francisco Bay Area",
+      "state": "CA",
+      "region": "West",
+      "major_cities": ["San Francisco", "San Jose", "Oakland", "Palo Alto", "Mountain View", "Sunnyvale"],
+      "zip_code_samples": ["94102", "94103", "94107", "94110", "94114", "94115", "94117", "94301", "94304", "94043", "94085", "94086", "94087", "94601", "94612"],
+      "population": 7700000,
+      "economic_profile": "booming",
+      "tech_hub": true
+    },
+    {
+      "metro_id": "miami_metro",
+      "metro_name": "Miami Metro",
+      "state": "FL",
+      "region": "Southeast",
+      "major_cities": ["Miami", "Fort Lauderdale", "Miami Beach", "Coral Gables", "Boca Raton"],
+      "zip_code_samples": ["33101", "33109", "33125", "33126", "33128", "33129", "33130", "33134", "33135", "33137", "33139", "33154", "33304", "33316"],
+      "population": 6100000,
+      "economic_profile": "growing",
+      "tech_hub": false
+    },
+    {
+      "metro_id": "denver_metro",
+      "metro_name": "Denver Metro",
+      "state": "CO",
+      "region": "West",
+      "major_cities": ["Denver", "Aurora", "Lakewood", "Boulder", "Fort Collins"],
+      "zip_code_samples": ["80202", "80203", "80204", "80205", "80206", "80209", "80210", "80218", "80220", "80222", "80228", "80302", "80304"],
+      "population": 2900000,
+      "economic_profile": "booming",
+      "tech_hub": true
+    },
+    {
+      "metro_id": "atlanta_metro",
+      "metro_name": "Atlanta Metro",
+      "state": "GA",
+      "region": "Southeast",
+      "major_cities": ["Atlanta", "Sandy Springs", "Marietta", "Roswell", "Johns Creek"],
+      "zip_code_samples": ["30303", "30305", "30306", "30308", "30309", "30312", "30314", "30318", "30324", "30328", "30339", "30342"],
+      "population": 6000000,
+      "economic_profile": "growing",
+      "tech_hub": true
+    },
+    {
+      "metro_id": "dallas_metro",
+      "metro_name": "Dallas-Fort Worth Metro",
+      "state": "TX",
+      "region": "Southwest",
+      "major_cities": ["Dallas", "Fort Worth", "Plano", "Irving", "Frisco", "McKinney"],
+      "zip_code_samples": ["75201", "75202", "75204", "75205", "75206", "75214", "75219", "75225", "75240", "75248", "75251", "75024", "75034", "75035"],
+      "population": 7600000,
+      "economic_profile": "booming",
+      "tech_hub": true
+    },
+    {
+      "metro_id": "portland_metro",
+      "metro_name": "Portland Metro",
+      "state": "OR",
+      "region": "West",
+      "major_cities": ["Portland", "Beaverton", "Hillsboro", "Gresham"],
+      "zip_code_samples": ["97201", "97202", "97204", "97205", "97209", "97210", "97211", "97212", "97214", "97217", "97220", "97225"],
+      "population": 2500000,
+      "economic_profile": "growing",
+      "tech_hub": true
+    },
+    {
+      "metro_id": "philadelphia_metro",
+      "metro_name": "Philadelphia Metro",
+      "state": "PA",
+      "region": "Northeast",
+      "major_cities": ["Philadelphia", "Camden", "Wilmington"],
+      "zip_code_samples": ["19102", "19103", "19104", "19106", "19107", "19111", "19114", "19116", "19120", "19122", "19125", "19130", "19134", "19145"],
+      "population": 6200000,
+      "economic_profile": "stable",
+      "tech_hub": false
+    }
+  ]
+}
+

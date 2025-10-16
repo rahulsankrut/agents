@@ -1,0 +1,145 @@
+{
+  "categories": [
+    {
+      "category_id": "pet_supplies",
+      "category_name": "Pet Supplies",
+      "subcategories": ["dog_food", "cat_food", "dog_toys", "cat_toys", "pet_medications", "pet_grooming", "pet_accessories", "aquarium_supplies"],
+      "seasonality": "stable",
+      "growth_rate": 0.15
+    },
+    {
+      "category_id": "consumer_electronics",
+      "category_name": "Consumer Electronics",
+      "subcategories": ["smartphones", "laptops", "tablets", "smart_home_devices", "audio_equipment", "cameras", "wearables", "gaming_consoles"],
+      "seasonality": "q4_peak",
+      "growth_rate": 0.12
+    },
+    {
+      "category_id": "coffee_products",
+      "category_name": "Coffee Products",
+      "subcategories": ["whole_bean_coffee", "ground_coffee", "coffee_pods", "espresso_machines", "coffee_makers", "coffee_accessories", "specialty_coffee"],
+      "seasonality": "stable",
+      "growth_rate": 0.08
+    },
+    {
+      "category_id": "skincare",
+      "category_name": "Skincare Products",
+      "subcategories": ["k_beauty", "natural_serums", "anti_aging", "male_grooming", "probiotic_skincare", "sunscreen", "moisturizers", "cleansers"],
+      "seasonality": "stable",
+      "growth_rate": 0.22
+    },
+    {
+      "category_id": "home_fitness",
+      "category_name": "Home Fitness Equipment",
+      "subcategories": ["dumbbells", "resistance_bands", "yoga_mats", "treadmills", "exercise_bikes", "rowing_machines", "fitness_trackers", "protein_supplements"],
+      "seasonality": "q1_peak",
+      "growth_rate": 0.18
+    },
+    {
+      "category_id": "winter_outerwear",
+      "category_name": "Winter Outerwear",
+      "subcategories": ["down_jackets", "parkas", "ski_jackets", "winter_coats", "insulated_vests", "snow_pants", "thermal_layers"],
+      "seasonality": "q4_peak",
+      "growth_rate": 0.10
+    },
+    {
+      "category_id": "books",
+      "category_name": "Books",
+      "subcategories": ["fiction", "non_fiction", "children_books", "textbooks", "cookbooks", "self_help", "business_books"],
+      "seasonality": "stable",
+      "growth_rate": 0.03
+    },
+    {
+      "category_id": "toys",
+      "category_name": "Toys & Games",
+      "subcategories": ["action_figures", "board_games", "educational_toys", "dolls", "building_sets", "outdoor_toys", "puzzles"],
+      "seasonality": "q4_peak",
+      "growth_rate": 0.07
+    },
+    {
+      "category_id": "home_decor",
+      "category_name": "Home Decor",
+      "subcategories": ["wall_art", "candles", "throw_pillows", "rugs", "curtains", "mirrors", "vases", "lighting"],
+      "seasonality": "stable",
+      "growth_rate": 0.09
+    },
+    {
+      "category_id": "kitchen_appliances",
+      "category_name": "Kitchen Appliances",
+      "subcategories": ["blenders", "air_fryers", "instant_pots", "coffee_makers", "toasters", "mixers", "food_processors"],
+      "seasonality": "q4_peak",
+      "growth_rate": 0.11
+    },
+    {
+      "category_id": "baby_products",
+      "category_name": "Baby Products",
+      "subcategories": ["diapers", "baby_formula", "baby_wipes", "strollers", "car_seats", "baby_monitors", "baby_clothing"],
+      "seasonality": "stable",
+      "growth_rate": 0.06
+    },
+    {
+      "category_id": "vitamins_supplements",
+      "category_name": "Vitamins & Supplements",
+      "subcategories": ["multivitamins", "protein_powder", "omega_3", "probiotics", "vitamin_d", "vitamin_c", "herbal_supplements"],
+      "seasonality": "q1_peak",
+      "growth_rate": 0.14
+    },
+    {
+      "category_id": "outdoor_gear",
+      "category_name": "Outdoor Gear",
+      "subcategories": ["camping_equipment", "hiking_boots", "backpacks", "tents", "sleeping_bags", "outdoor_clothing"],
+      "seasonality": "q2_peak",
+      "growth_rate": 0.13
+    },
+    {
+      "category_id": "beauty_cosmetics",
+      "category_name": "Beauty & Cosmetics",
+      "subcategories": ["makeup", "lipstick", "foundation", "eyeshadow", "mascara", "nail_polish", "makeup_brushes"],
+      "seasonality": "stable",
+      "growth_rate": 0.10
+    },
+    {
+      "category_id": "jewelry",
+      "category_name": "Jewelry & Accessories",
+      "subcategories": ["necklaces", "earrings", "bracelets", "rings", "watches", "sunglasses"],
+      "seasonality": "q4_peak",
+      "growth_rate": 0.05
+    },
+    {
+      "category_id": "sporting_goods",
+      "category_name": "Sporting Goods",
+      "subcategories": ["golf_equipment", "tennis_rackets", "basketballs", "soccer_balls", "baseball_gloves", "athletic_shoes"],
+      "seasonality": "q2_peak",
+      "growth_rate": 0.08
+    },
+    {
+      "category_id": "craft_supplies",
+      "category_name": "Craft Supplies",
+      "subcategories": ["yarn", "fabric", "sewing_machines", "art_supplies", "scrapbooking", "beads", "paint"],
+      "seasonality": "stable",
+      "growth_rate": 0.07
+    },
+    {
+      "category_id": "automotive_parts",
+      "category_name": "Automotive Parts",
+      "subcategories": ["oil_filters", "air_filters", "brake_pads", "batteries", "wiper_blades", "spark_plugs"],
+      "seasonality": "stable",
+      "growth_rate": 0.04
+    },
+    {
+      "category_id": "garden_supplies",
+      "category_name": "Garden Supplies",
+      "subcategories": ["seeds", "fertilizers", "garden_tools", "planters", "hoses", "lawn_mowers"],
+      "seasonality": "q2_peak",
+      "growth_rate": 0.09
+    },
+    {
+      "category_id": "office_supplies",
+      "category_name": "Office Supplies",
+      "subcategories": ["printer_paper", "pens", "notebooks", "folders", "desk_organizers", "staplers"],
+      "seasonality": "stable",
+      "growth_rate": 0.02
+    }
+  ]
+}
+
